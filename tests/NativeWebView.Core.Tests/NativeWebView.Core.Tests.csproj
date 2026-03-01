@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/NativeWebView.Core/NativeWebView.Core.csproj" />
+    <ProjectReference Include="../../src/NativeWebView/NativeWebView.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Dialog/NativeWebView.Dialog.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Interop/NativeWebView.Interop.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Android/NativeWebView.Platform.Android.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Browser/NativeWebView.Platform.Browser.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Windows/NativeWebView.Platform.Windows.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.macOS/NativeWebView.Platform.macOS.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Linux/NativeWebView.Platform.Linux.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.iOS/NativeWebView.Platform.iOS.csproj" />
+  </ItemGroup>
+
+</Project>

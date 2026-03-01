@@ -1,0 +1,157 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Format and analyzer verification
+        run: dotnet format NativeWebView.sln --verify-no-changes --severity warn
+
+      - name: Validate changelog fragments
+        run: ./scripts/validate-changelog-fragments.sh
+
+  build-test:
+    needs: quality
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Build
+        run: dotnet build NativeWebView.sln -c Debug --no-restore
+
+      - name: Test
+        run: dotnet test NativeWebView.sln -c Debug --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: |
+            **/TestResults/*.trx
+
+  package:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Build release
+        run: dotnet build NativeWebView.sln -c Release --no-restore
+
+      - name: Validate diagnostics exit code contract
+        run: ./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
+
+      - name: Desktop sample smoke
+        run: ./scripts/run-desktop-sample-smoke.sh --configuration Release --no-build
+
+      - name: Mobile/browser sample smoke
+        run: ./scripts/run-mobile-browser-sample-smoke.sh --configuration Release --no-build --platform all
+
+      - name: Platform diagnostics report
+        run: ./scripts/run-platform-diagnostics-report.sh --configuration Release --no-build --platform all --output artifacts/diagnostics/ci-platform-diagnostics.json --markdown-output artifacts/diagnostics/ci-platform-diagnostics.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --blocking-baseline-output artifacts/diagnostics/ci-current-blocking-baseline.txt --comparison-markdown-output artifacts/diagnostics/ci-blocking-regression.md --comparison-json-output artifacts/diagnostics/ci-blocking-regression.json --comparison-evaluation-markdown-output artifacts/diagnostics/ci-gate-evaluation.md --require-baseline-sync --allow-not-ready
+
+      - name: Publish diagnostics summary
+        if: always()
+        run: |
+          if [[ -f artifacts/diagnostics/ci-platform-diagnostics.md ]]; then
+            cat artifacts/diagnostics/ci-platform-diagnostics.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Diagnostics markdown summary was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [[ -f artifacts/diagnostics/ci-blocking-regression.md ]]; then
+            echo >> "$GITHUB_STEP_SUMMARY"
+            cat artifacts/diagnostics/ci-blocking-regression.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Blocking regression markdown summary was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [[ -f artifacts/diagnostics/ci-gate-evaluation.md ]]; then
+            echo >> "$GITHUB_STEP_SUMMARY"
+            cat artifacts/diagnostics/ci-gate-evaluation.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Gate evaluation markdown summary was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [[ -f artifacts/diagnostics/exit-code-contract/exit-code-contract-summary.md ]]; then
+            echo >> "$GITHUB_STEP_SUMMARY"
+            cat artifacts/diagnostics/exit-code-contract/exit-code-contract-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Exit code contract summary was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [[ -f artifacts/diagnostics/exit-code-contract/fingerprint-baseline-comparison.md ]]; then
+            echo >> "$GITHUB_STEP_SUMMARY"
+            cat artifacts/diagnostics/exit-code-contract/fingerprint-baseline-comparison.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Fingerprint baseline comparison summary was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Pack
+        run: dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages -p:ContinuousIntegrationBuild=true
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/packages/*
+
+      - name: Upload diagnostics report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-diagnostics
+          if-no-files-found: error
+          path: |
+            artifacts/diagnostics/ci-platform-diagnostics.json
+            artifacts/diagnostics/ci-platform-diagnostics.md
+            artifacts/diagnostics/ci-current-blocking-baseline.txt
+            artifacts/diagnostics/ci-blocking-regression.md
+            artifacts/diagnostics/ci-blocking-regression.json
+            artifacts/diagnostics/ci-gate-evaluation.md
+            artifacts/diagnostics/exit-code-contract/*

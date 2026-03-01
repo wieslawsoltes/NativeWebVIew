@@ -1,0 +1,105 @@
+name: extended-validation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  browser-playwright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: tests/NativeWebView.Playwright/package-lock.json
+
+      - name: Run browser Playwright smoke script
+        run: ./scripts/run-browser-playwright-smoke.sh --python python3 --venv .venv-docs
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          if-no-files-found: warn
+          path: |
+            tests/NativeWebView.Playwright/playwright-report
+            tests/NativeWebView.Playwright/test-results
+
+  ios-contract-smoke:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Build release
+        run: dotnet build NativeWebView.sln -c Release --no-restore
+
+      - name: iOS contract smoke
+        run: ./scripts/run-ios-simulator-contract-smoke.sh --configuration Release --no-build
+
+      - name: Upload simulator logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-logs
+          if-no-files-found: warn
+          path: ${{ env.HOME }}/Library/Logs/CoreSimulator/**
+
+  android-contract-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Build release
+        run: dotnet build NativeWebView.sln -c Release --no-restore
+
+      - name: Android emulator contract smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          script: ./scripts/run-android-emulator-contract-smoke.sh --configuration Release --no-build --logcat-output artifacts/android-logcat.txt
+
+      - name: Upload Android logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-logcat
+          if-no-files-found: warn
+          path: artifacts/android-logcat.txt

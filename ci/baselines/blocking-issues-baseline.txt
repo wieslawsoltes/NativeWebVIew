@@ -1,0 +1,3 @@
+# NativeWebView blocking diagnostics baseline
+# Format: <Platform>|<IssueCode>
+# This baseline intentionally starts empty: no blocking issues are expected.

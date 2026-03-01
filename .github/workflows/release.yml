@@ -1,0 +1,121 @@
+name: release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Resolve version from tag
+        run: echo "PACKAGE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Restore
+        run: dotnet restore NativeWebView.sln
+
+      - name: Validate changelog fragments
+        run: ./scripts/validate-changelog-fragments.sh
+
+      - name: Build release
+        run: dotnet build NativeWebView.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Test release
+        run: dotnet test NativeWebView.sln -c Release --no-build
+
+      - name: Validate diagnostics exit code contract
+        run: ./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }} --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
+
+      - name: Desktop sample smoke
+        run: ./scripts/run-desktop-sample-smoke.sh --configuration Release --no-build
+
+      - name: Mobile/browser sample smoke
+        run: ./scripts/run-mobile-browser-sample-smoke.sh --configuration Release --no-build --platform all
+
+      - name: Platform diagnostics report
+        run: ./scripts/run-platform-diagnostics-report.sh --configuration Release --no-build --platform all --output artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.json --markdown-output artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --blocking-baseline-output artifacts/diagnostics/release-current-blocking-baseline-${{ env.PACKAGE_VERSION }}.txt --comparison-markdown-output artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.md --comparison-json-output artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.json --comparison-evaluation-markdown-output artifacts/diagnostics/release-gate-evaluation-${{ env.PACKAGE_VERSION }}.md --require-baseline-sync --allow-not-ready
+
+      - name: Pack release
+        run: dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages -p:ContinuousIntegrationBuild=true -p:Version=${{ env.PACKAGE_VERSION }}
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ env.PACKAGE_VERSION }}
+          path: artifacts/packages/*
+
+      - name: Build release notes
+        run: ./scripts/build-release-notes.sh --version "${{ env.PACKAGE_VERSION }}" --output artifacts/release-notes.md
+
+      - name: Append diagnostics summary to release notes
+        run: |
+          {
+            echo
+            cat "artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.md"
+            echo
+            cat "artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.md"
+            echo
+            cat "artifacts/diagnostics/release-gate-evaluation-${{ env.PACKAGE_VERSION }}.md"
+            echo
+            cat "artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }}/exit-code-contract-summary.md"
+            if [[ -f "artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }}/fingerprint-baseline-comparison.md" ]]; then
+              echo
+              cat "artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }}/fingerprint-baseline-comparison.md"
+            fi
+          } >> artifacts/release-notes.md
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes-${{ env.PACKAGE_VERSION }}
+          path: artifacts/release-notes.md
+
+      - name: Upload diagnostics report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-diagnostics-${{ env.PACKAGE_VERSION }}
+          if-no-files-found: error
+          path: |
+            artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.json
+            artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/release-current-blocking-baseline-${{ env.PACKAGE_VERSION }}.txt
+            artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.json
+            artifacts/diagnostics/release-gate-evaluation-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }}/*
+
+      - name: Push .nupkg to NuGet
+        if: ${{ secrets.NUGET_API_KEY != '' }}
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Push .snupkg to NuGet
+        if: ${{ secrets.NUGET_API_KEY != '' }}
+        run: dotnet nuget push "artifacts/packages/*.snupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: artifacts/release-notes.md
+          files: |
+            artifacts/packages/*.nupkg
+            artifacts/packages/*.snupkg
+            artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.json
+            artifacts/diagnostics/release-platform-diagnostics-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/release-current-blocking-baseline-${{ env.PACKAGE_VERSION }}.txt
+            artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/release-blocking-regression-${{ env.PACKAGE_VERSION }}.json
+            artifacts/diagnostics/release-gate-evaluation-${{ env.PACKAGE_VERSION }}.md
+            artifacts/diagnostics/exit-code-contract-${{ env.PACKAGE_VERSION }}/*
