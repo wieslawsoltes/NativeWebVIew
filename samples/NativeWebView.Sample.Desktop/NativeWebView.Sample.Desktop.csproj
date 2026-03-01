@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>NativeWebView.Sample.Desktop</AssemblyName>
+    <RootNamespace>NativeWebView.Sample.Desktop</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/NativeWebView/NativeWebView.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Dialog/NativeWebView.Dialog.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Auth/NativeWebView.Auth.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Core/NativeWebView.Core.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Interop/NativeWebView.Interop.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Windows/NativeWebView.Platform.Windows.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.macOS/NativeWebView.Platform.macOS.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Linux/NativeWebView.Platform.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Diagnostics" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="FluentIcons.Avalonia" />
+  </ItemGroup>
+</Project>

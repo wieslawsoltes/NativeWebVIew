@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>NativeWebView.Sample.MobileBrowser</AssemblyName>
+    <RootNamespace>NativeWebView.Sample.MobileBrowser</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/NativeWebView.Core/NativeWebView.Core.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Interop/NativeWebView.Interop.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.iOS/NativeWebView.Platform.iOS.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Android/NativeWebView.Platform.Android.csproj" />
+    <ProjectReference Include="../../src/NativeWebView.Platform.Browser/NativeWebView.Platform.Browser.csproj" />
+  </ItemGroup>
+</Project>

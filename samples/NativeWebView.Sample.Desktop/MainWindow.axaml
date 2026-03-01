@@ -1,0 +1,509 @@
+<Window
+    x:Class="NativeWebView.Sample.Desktop.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:fi="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+    xmlns:nwv="clr-namespace:NativeWebView.Controls;assembly=NativeWebView"
+    MinHeight="820"
+    MinWidth="1280"
+    Width="1500"
+    Height="920"
+    Title="NativeWebView Feature Explorer">
+  <Window.Styles>
+    <Style Selector="Button.toolbar">
+      <Setter Property="Width" Value="34" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,4,0" />
+    </Style>
+    <Style Selector="Button.menu-action">
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="MinWidth" Value="240" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*,220" ColumnDefinitions="2*,1*">
+    <Border Grid.Row="0" Grid.ColumnSpan="2" Padding="8" Background="#E8EEF9" BorderBrush="#CBD5E8" BorderThickness="0,0,0,1">
+      <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto">
+        <Button x:Name="BackButton" Grid.Row="0" Grid.Column="0" Classes="toolbar" Click="BackButtonOnClick" ToolTip.Tip="Back">
+          <fi:SymbolIcon Symbol="ArrowLeft" />
+        </Button>
+        <Button x:Name="ForwardButton" Grid.Row="0" Grid.Column="1" Classes="toolbar" Click="ForwardButtonOnClick" ToolTip.Tip="Forward">
+          <fi:SymbolIcon Symbol="ArrowRight" />
+        </Button>
+        <Button x:Name="ReloadButton" Grid.Row="0" Grid.Column="2" Classes="toolbar" Click="ReloadButtonOnClick" ToolTip.Tip="Reload">
+          <fi:SymbolIcon Symbol="ArrowClockwise" />
+        </Button>
+        <Button x:Name="StopButton" Grid.Row="0" Grid.Column="3" Classes="toolbar" Click="StopButtonOnClick" ToolTip.Tip="Stop">
+          <fi:SymbolIcon Symbol="Stop" />
+        </Button>
+        <Button x:Name="NavigateButton" Grid.Row="0" Grid.Column="4" Classes="toolbar" Width="42" Click="NavigateButtonOnClick" ToolTip.Tip="Navigate">
+          <fi:SymbolIcon Symbol="ArrowEnter" />
+        </Button>
+
+        <TextBox
+            x:Name="UrlTextBox"
+            Grid.Row="0"
+            Grid.Column="5"
+            Height="34"
+            Margin="4,0,8,0"
+            VerticalContentAlignment="Center"
+            Watermark="Enter URL and press Enter or Navigate" />
+
+        <Button
+            x:Name="RefreshStateButton"
+            Grid.Row="0"
+            Grid.Column="6"
+            Classes="toolbar"
+            Click="RefreshStateButtonOnClick"
+            ToolTip.Tip="Refresh state summary">
+          <fi:SymbolIcon Symbol="ArrowSync" />
+        </Button>
+
+        <Button Grid.Row="0" Grid.Column="7" Classes="toolbar" Margin="0" ToolTip.Tip="Menu">
+          <fi:SymbolIcon Symbol="MoreVertical" />
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedRight">
+              <StackPanel MinWidth="260" Margin="4" Spacing="4">
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="WebView Actions" />
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="Panels" />
+
+                <Button Classes="menu-action" Click="ToggleAdvancedPanelsMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Settings" />
+                    <TextBlock VerticalAlignment="Center" Text="Toggle Advanced Controls" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="ShowWebViewPanelMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Globe" />
+                    <TextBlock VerticalAlignment="Center" Text="Show WebView Panel" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="ShowDialogPanelMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Window" />
+                    <TextBlock VerticalAlignment="Center" Text="Show Dialog Panel" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="ShowAuthPanelMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Shield" />
+                    <TextBlock VerticalAlignment="Center" Text="Show Auth Panel" />
+                  </StackPanel>
+                </Button>
+
+                <Separator Margin="4" />
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="Rendering" />
+
+                <Button Classes="menu-action" Click="UseEmbeddedRenderModeMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Desktop" />
+                    <TextBlock VerticalAlignment="Center" Text="Use Embedded Mode" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="UseGpuSurfaceRenderModeMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="WindowConsole" />
+                    <TextBlock VerticalAlignment="Center" Text="Use GPU Surface Mode" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="UseOffscreenRenderModeMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Camera" />
+                    <TextBlock VerticalAlignment="Center" Text="Use Offscreen Mode" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="BoostRenderFpsMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="ArrowUp" />
+                    <TextBlock VerticalAlignment="Center" Text="Increase Render FPS" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="ReduceRenderFpsMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="ArrowDown" />
+                    <TextBlock VerticalAlignment="Center" Text="Decrease Render FPS" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="CaptureRenderFrameMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Image" />
+                    <TextBlock VerticalAlignment="Center" Text="Capture Render Frame" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="SaveRenderFrameMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Save" />
+                    <TextBlock VerticalAlignment="Center" Text="Save Frame As PNG" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="SaveRenderFrameWithMetadataMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="DocumentData" />
+                    <TextBlock VerticalAlignment="Center" Text="Save Frame + Metadata" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="LoadRenderFrameMetadataMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="DocumentData" />
+                    <TextBlock VerticalAlignment="Center" Text="Load Frame Metadata" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="menu-action" Click="ResetRenderStatisticsMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Delete" />
+                    <TextBlock VerticalAlignment="Center" Text="Reset Render Stats" />
+                  </StackPanel>
+                </Button>
+
+                <Separator Margin="4" />
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="Airspace" />
+
+                <Button Classes="menu-action" Click="ToggleManagedOverlayMenuItemOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Window" />
+                    <TextBlock VerticalAlignment="Center" Text="Toggle Managed Overlay" />
+                  </StackPanel>
+                </Button>
+
+                <Button x:Name="OpenDevToolsButton" Classes="menu-action" Click="OpenDevToolsButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="WindowDevTools" />
+                    <TextBlock VerticalAlignment="Center" Text="Open DevTools" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="PrintButton" Classes="menu-action" Click="PrintButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Print" />
+                    <TextBlock VerticalAlignment="Center" Text="Print" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="PrintUiButton" Classes="menu-action" Click="PrintUiButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Window" />
+                    <TextBlock VerticalAlignment="Center" Text="Show Print UI" />
+                  </StackPanel>
+                </Button>
+
+                <Separator Margin="4" />
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="Focus" />
+
+                <Button x:Name="MoveFocusNextButton" Classes="menu-action" Click="MoveFocusNextButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="ArrowNext" />
+                    <TextBlock VerticalAlignment="Center" Text="Move Focus Next" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="MoveFocusPreviousButton" Classes="menu-action" Click="MoveFocusPreviousButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="ArrowPrevious" />
+                    <TextBlock VerticalAlignment="Center" Text="Move Focus Previous" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="MoveFocusProgrammaticButton" Classes="menu-action" Click="MoveFocusProgrammaticButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="ArrowEnter" />
+                    <TextBlock VerticalAlignment="Center" Text="Move Focus Programmatic" />
+                  </StackPanel>
+                </Button>
+
+                <Separator Margin="4" />
+                <TextBlock Margin="8,4,8,2" FontWeight="SemiBold" Opacity="0.75" Text="Advanced" />
+
+                <Button x:Name="CommandManagerButton" Classes="menu-action" Click="CommandManagerButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Code" />
+                    <TextBlock VerticalAlignment="Center" Text="Try CommandManager" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="CookieReadButton" Classes="menu-action" Click="CookieReadButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Cookies" />
+                    <TextBlock VerticalAlignment="Center" Text="Read Cookies" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="CookieSetButton" Classes="menu-action" Click="CookieSetButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Add" />
+                    <TextBlock VerticalAlignment="Center" Text="Set Cookie" />
+                  </StackPanel>
+                </Button>
+                <Button x:Name="CookieDeleteButton" Classes="menu-action" Click="CookieDeleteButtonOnClick">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <fi:SymbolIcon Symbol="Delete" />
+                    <TextBlock VerticalAlignment="Center" Text="Delete Cookie" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+
+        <TextBlock
+            x:Name="HeaderTextBlock"
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="8"
+            Margin="6,8,0,0"
+            FontSize="13"
+            FontWeight="SemiBold"
+            Foreground="#314258" />
+      </Grid>
+    </Border>
+
+    <TabControl x:Name="AdvancedTabControl" Grid.Row="1" Grid.ColumnSpan="2" Margin="8" Height="260" IsVisible="False">
+      <TabItem Header="WebView">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="8" Spacing="10">
+            <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Script" />
+                  <TextBox x:Name="ScriptTextBox" Width="760" />
+                  <Button x:Name="ExecuteScriptButton" Click="ExecuteScriptButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="Code" />
+                      <TextBlock VerticalAlignment="Center" Text="Execute Script" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Message" />
+                  <TextBox x:Name="MessageTextBox" Width="760" />
+                  <Button x:Name="PostMessageStringButton" Click="PostMessageStringButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="Send" />
+                      <TextBlock VerticalAlignment="Center" Text="Post String" />
+                    </StackPanel>
+                  </Button>
+                  <Button x:Name="PostMessageJsonButton" Click="PostMessageJsonButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="Code" />
+                      <TextBlock VerticalAlignment="Center" Text="Post JSON" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Zoom" />
+                  <TextBox x:Name="ZoomTextBox" Width="100" />
+                  <Button x:Name="SetZoomButton" Click="SetZoomButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="ArrowExpand" />
+                      <TextBlock VerticalAlignment="Center" Text="Set Zoom" />
+                    </StackPanel>
+                  </Button>
+                  <TextBlock Width="95" Margin="16,0,0,0" VerticalAlignment="Center" Text="User Agent" />
+                  <TextBox x:Name="UserAgentTextBox" Width="320" />
+                  <Button x:Name="SetUserAgentButton" Click="SetUserAgentButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="Person" />
+                      <TextBlock VerticalAlignment="Center" Text="Set UA" />
+                    </StackPanel>
+                  </Button>
+                  <TextBlock Width="65" Margin="16,0,0,0" VerticalAlignment="Center" Text="Header" />
+                  <TextBox x:Name="HeaderValueTextBox" Width="260" />
+                  <Button x:Name="SetHeaderButton" Click="SetHeaderButtonOnClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <fi:SymbolIcon Symbol="TextAdd" />
+                      <TextBlock VerticalAlignment="Center" Text="Set Header" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+
+                <WrapPanel Orientation="Horizontal" ItemHeight="34" ItemWidth="220">
+                  <CheckBox x:Name="DevToolsEnabledCheckBox" Content="DevTools Enabled" IsChecked="True" Checked="DevToolsEnabledCheckBoxOnChecked" Unchecked="DevToolsEnabledCheckBoxOnChecked" />
+                  <CheckBox x:Name="ContextMenuEnabledCheckBox" Content="Context Menu Enabled" IsChecked="True" Checked="ContextMenuEnabledCheckBoxOnChecked" Unchecked="ContextMenuEnabledCheckBoxOnChecked" />
+                  <CheckBox x:Name="StatusBarEnabledCheckBox" Content="Status Bar Enabled" IsChecked="True" Checked="StatusBarEnabledCheckBoxOnChecked" Unchecked="StatusBarEnabledCheckBoxOnChecked" />
+                  <CheckBox x:Name="ZoomControlEnabledCheckBox" Content="Zoom Control Enabled" IsChecked="True" Checked="ZoomControlEnabledCheckBoxOnChecked" Unchecked="ZoomControlEnabledCheckBoxOnChecked" />
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Dialog">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="8" Spacing="10">
+            <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="URL" />
+                  <TextBox x:Name="DialogUrlTextBox" Width="620" />
+                  <Button x:Name="DialogShowButton" Content="Show" Click="DialogShowButtonOnClick" />
+                  <Button x:Name="DialogCloseButton" Content="Close" Click="DialogCloseButtonOnClick" />
+                  <Button x:Name="DialogNavigateButton" Content="Navigate" Click="DialogNavigateButtonOnClick" />
+                  <Button x:Name="DialogBackButton" Content="Back" Click="DialogBackButtonOnClick" />
+                  <Button x:Name="DialogForwardButton" Content="Forward" Click="DialogForwardButtonOnClick" />
+                  <Button x:Name="DialogReloadButton" Content="Reload" Click="DialogReloadButtonOnClick" />
+                  <Button x:Name="DialogStopButton" Content="Stop" Click="DialogStopButtonOnClick" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Script" />
+                  <TextBox x:Name="DialogScriptTextBox" Width="620" />
+                  <Button x:Name="DialogExecuteScriptButton" Content="Execute Script" Click="DialogExecuteScriptButtonOnClick" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Message" />
+                  <TextBox x:Name="DialogMessageTextBox" Width="620" />
+                  <Button x:Name="DialogPostStringButton" Content="Post String" Click="DialogPostStringButtonOnClick" />
+                  <Button x:Name="DialogPostJsonButton" Content="Post JSON" Click="DialogPostJsonButtonOnClick" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+              <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Width="70" VerticalAlignment="Center" Text="Move" />
+                  <TextBox x:Name="DialogLeftTextBox" Width="90" Watermark="Left" />
+                  <TextBox x:Name="DialogTopTextBox" Width="90" Watermark="Top" />
+                  <TextBlock Width="70" Margin="16,0,0,0" VerticalAlignment="Center" Text="Resize" />
+                  <TextBox x:Name="DialogWidthTextBox" Width="90" Watermark="Width" />
+                  <TextBox x:Name="DialogHeightTextBox" Width="90" Watermark="Height" />
+                  <TextBlock Width="65" Margin="16,0,0,0" VerticalAlignment="Center" Text="Zoom" />
+                  <TextBox x:Name="DialogZoomTextBox" Width="90" />
+                  <TextBlock Width="95" Margin="16,0,0,0" VerticalAlignment="Center" Text="User Agent" />
+                  <TextBox x:Name="DialogUserAgentTextBox" Width="220" />
+                  <TextBlock Width="65" Margin="16,0,0,0" VerticalAlignment="Center" Text="Header" />
+                  <TextBox x:Name="DialogHeaderTextBox" Width="180" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button x:Name="DialogMoveButton" Content="Move" Click="DialogMoveButtonOnClick" />
+                  <Button x:Name="DialogResizeButton" Content="Resize" Click="DialogResizeButtonOnClick" />
+                  <Button x:Name="DialogSetZoomButton" Content="Set Zoom" Click="DialogSetZoomButtonOnClick" />
+                  <Button x:Name="DialogSetUserAgentButton" Content="Set UA" Click="DialogSetUserAgentButtonOnClick" />
+                  <Button x:Name="DialogSetHeaderButton" Content="Set Header" Click="DialogSetHeaderButtonOnClick" />
+                  <Button x:Name="DialogOpenDevToolsButton" Content="Open DevTools" Click="DialogOpenDevToolsButtonOnClick" />
+                  <Button x:Name="DialogPrintButton" Content="Print" Click="DialogPrintButtonOnClick" />
+                  <Button x:Name="DialogPrintUiButton" Content="Show Print UI" Click="DialogPrintUiButtonOnClick" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Auth">
+        <StackPanel Margin="8" Spacing="10">
+          <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Width="100" VerticalAlignment="Center" Text="Request URI" />
+                <TextBox x:Name="AuthRequestUriTextBox" Width="900" />
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Width="100" VerticalAlignment="Center" Text="Callback URI" />
+                <TextBox x:Name="AuthCallbackUriTextBox" Width="900" />
+              </StackPanel>
+
+              <WrapPanel Orientation="Horizontal" ItemHeight="34" ItemWidth="220">
+                <CheckBox x:Name="AuthSilentModeCheckBox" Content="SilentMode" />
+                <CheckBox x:Name="AuthUseTitleCheckBox" Content="UseTitle" />
+                <CheckBox x:Name="AuthUseHttpPostCheckBox" Content="UseHttpPost" />
+                <CheckBox x:Name="AuthUseCorporateNetworkCheckBox" Content="UseCorporateNetwork" />
+                <CheckBox x:Name="AuthUseBrokerCheckBox" Content="UseWebAuthenticationBroker" />
+                <Button x:Name="AuthenticateButton" Content="Authenticate" Click="AuthenticateButtonOnClick" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+
+          <Border Padding="10" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="6">
+            <TextBlock x:Name="AuthResultTextBlock" TextWrapping="Wrap" />
+          </Border>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+
+    <Border Grid.Row="2" Grid.Column="0" Margin="8" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="4">
+      <Grid>
+        <nwv:NativeWebView x:Name="WebViewControl" />
+        <TextBlock
+            Margin="10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            IsHitTestVisible="False"
+            Opacity="0.6"
+            Text="NativeWebView host surface" />
+        <Border
+            x:Name="ManagedOverlayPanel"
+            Margin="16"
+            Padding="12"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Background="#E6232938"
+            BorderBrush="#9FD2E7FF"
+            BorderThickness="1"
+            CornerRadius="10"
+            IsVisible="False">
+          <StackPanel Width="300" Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <fi:SymbolIcon Symbol="Window" Foreground="#D2E7FF" />
+              <TextBlock FontWeight="SemiBold" Foreground="#D2E7FF" Text="Managed Airspace Overlay" />
+            </StackPanel>
+            <TextBlock
+                Foreground="#CFD6E4"
+                TextWrapping="Wrap"
+                Text="Avalonia-managed controls layered over the webview host for airspace testing." />
+            <TextBox x:Name="ManagedOverlayTextBox" Watermark="Type here to test managed input..." />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Click="ManagedOverlayActionButtonOnClick">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <fi:SymbolIcon Symbol="Code" />
+                  <TextBlock VerticalAlignment="Center" Text="Test Action" />
+                </StackPanel>
+              </Button>
+              <Button Click="ToggleManagedOverlayMenuItemOnClick">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <fi:SymbolIcon Symbol="Delete" />
+                  <TextBlock VerticalAlignment="Center" Text="Close Overlay" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <TabControl Grid.Row="2" Grid.Column="1" Margin="8">
+      <TabItem Header="Capabilities">
+        <TextBox x:Name="FeatureMatrixBox" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      </TabItem>
+      <TabItem Header="State">
+        <TextBox x:Name="StateSummaryBox" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      </TabItem>
+      <TabItem Header="Handles">
+        <TextBox x:Name="HandleSummaryBox" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      </TabItem>
+      <TabItem Header="Diagnostics">
+        <TextBox x:Name="DiagnosticsSummaryBox" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      </TabItem>
+    </TabControl>
+
+    <Border Grid.Row="3" Grid.ColumnSpan="2" Margin="8" BorderBrush="#3D4650" BorderThickness="1" CornerRadius="4" Padding="8">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock FontWeight="Bold" Text="Event Log" />
+        <TextBox
+            x:Name="EventLogBox"
+            Grid.Row="1"
+            Margin="0,6,0,0"
+            AcceptsReturn="True"
+            IsReadOnly="True"
+            TextWrapping="Wrap"
+            ScrollViewer.VerticalScrollBarVisibility="Auto" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
