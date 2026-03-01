@@ -1,0 +1,28 @@
+site_name: NativeWebView
+site_description: Native webview control stack for Avalonia
+repo_url: https://github.com/wieslawsoltes/NativeWebVIew
+repo_name: wieslawsoltes/NativeWebVIew
+strict: true
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - NativeWebView: nativewebview.md
+  - NativeWebDialog: nativewebdialog.md
+  - WebAuthenticationBroker: webauthenticationbroker.md
+  - Interop:
+    - Environment Options: interop/environment-options.md
+    - Native Handle Interop: interop/native-browser-interop.md
+  - Platform Prerequisites: platform-prerequisites.md
+  - Diagnostics Report: platform-diagnostics-report.md
+  - Platforms:
+    - Windows: platforms/windows.md
+    - macOS: platforms/macos.md
+    - Linux: platforms/linux.md
+    - iOS: platforms/ios.md
+    - Android: platforms/android.md
+    - Browser: platforms/browser.md
+  - CI and Release: ci-and-release.md
