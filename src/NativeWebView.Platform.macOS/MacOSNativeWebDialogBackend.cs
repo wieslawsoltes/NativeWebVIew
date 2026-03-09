@@ -18,46 +18,49 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
     private static readonly NativePlatformHandle PlaceholderDialogHandle = new((nint)0x2102, "WKWebView");
     private static readonly NativePlatformHandle PlaceholderHostWindowHandle = new((nint)0x2103, "NSWindow");
 
-    private static IntPtr NSStringClass => GetClass("NSString");
-    private static IntPtr NSURLClass => GetClass("NSURL");
-    private static IntPtr NSURLRequestClass => GetClass("NSURLRequest");
-    private static IntPtr NSWindowClass => GetClass("NSWindow");
-    private static IntPtr WKWebViewClass => GetClass("WKWebView");
-    private static IntPtr WKWebViewConfigurationClass => GetClass("WKWebViewConfiguration");
+    private static class NativeSymbols
+    {
+        public static IntPtr NSStringClass => ObjC.GetClass("NSString");
+        public static IntPtr NSURLClass => ObjC.GetClass("NSURL");
+        public static IntPtr NSURLRequestClass => ObjC.GetClass("NSURLRequest");
+        public static IntPtr NSWindowClass => ObjC.GetClass("NSWindow");
+        public static IntPtr WKWebViewClass => ObjC.GetClass("WKWebView");
+        public static IntPtr WKWebViewConfigurationClass => ObjC.GetClass("WKWebViewConfiguration");
 
-    private static IntPtr SelAlloc => GetSelector("alloc");
-    private static IntPtr SelInit => GetSelector("init");
-    private static IntPtr SelRelease => GetSelector("release");
-    private static IntPtr SelStringWithUtf8String => GetSelector("stringWithUTF8String:");
-    private static IntPtr SelUrlWithString => GetSelector("URLWithString:");
-    private static IntPtr SelRequestWithUrl => GetSelector("requestWithURL:");
-    private static IntPtr SelInitWithContentRectStyleMaskBackingDefer => GetSelector("initWithContentRect:styleMask:backing:defer:");
-    private static IntPtr SelSetReleasedWhenClosed => GetSelector("setReleasedWhenClosed:");
-    private static IntPtr SelSetTitle => GetSelector("setTitle:");
-    private static IntPtr SelCenter => GetSelector("center");
-    private static IntPtr SelMakeKeyAndOrderFront => GetSelector("makeKeyAndOrderFront:");
-    private static IntPtr SelClose => GetSelector("close");
-    private static IntPtr SelIsVisible => GetSelector("isVisible");
-    private static IntPtr SelSetFrameOrigin => GetSelector("setFrameOrigin:");
-    private static IntPtr SelSetContentSize => GetSelector("setContentSize:");
-    private static IntPtr SelContentView => GetSelector("contentView");
-    private static IntPtr SelSetFrame => GetSelector("setFrame:");
-    private static IntPtr SelAddSubview => GetSelector("addSubview:");
-    private static IntPtr SelRemoveFromSuperview => GetSelector("removeFromSuperview");
-    private static IntPtr SelSetAutoresizingMask => GetSelector("setAutoresizingMask:");
-    private static IntPtr SelInitWithFrameConfiguration => GetSelector("initWithFrame:configuration:");
-    private static IntPtr SelLoadRequest => GetSelector("loadRequest:");
-    private static IntPtr SelReload => GetSelector("reload");
-    private static IntPtr SelStopLoading => GetSelector("stopLoading");
-    private static IntPtr SelGoBack => GetSelector("goBack");
-    private static IntPtr SelGoForward => GetSelector("goForward");
-    private static IntPtr SelSetCustomUserAgent => GetSelector("setCustomUserAgent:");
-    private static IntPtr SelRespondsToSelector => GetSelector("respondsToSelector:");
-    private static IntPtr SelSetPageZoom => GetSelector("setPageZoom:");
-    private static IntPtr SelPrint => GetSelector("print:");
-    private static IntPtr SelBounds => GetSelector("bounds");
-    private static IntPtr SelDataWithPdfInsideRect => GetSelector("dataWithPDFInsideRect:");
-    private static IntPtr SelWriteToFileAtomically => GetSelector("writeToFile:atomically:");
+        public static IntPtr SelAlloc => ObjC.GetSelector("alloc");
+        public static IntPtr SelInit => ObjC.GetSelector("init");
+        public static IntPtr SelRelease => ObjC.GetSelector("release");
+        public static IntPtr SelStringWithUtf8String => ObjC.GetSelector("stringWithUTF8String:");
+        public static IntPtr SelUrlWithString => ObjC.GetSelector("URLWithString:");
+        public static IntPtr SelRequestWithUrl => ObjC.GetSelector("requestWithURL:");
+        public static IntPtr SelInitWithContentRectStyleMaskBackingDefer => ObjC.GetSelector("initWithContentRect:styleMask:backing:defer:");
+        public static IntPtr SelSetReleasedWhenClosed => ObjC.GetSelector("setReleasedWhenClosed:");
+        public static IntPtr SelSetTitle => ObjC.GetSelector("setTitle:");
+        public static IntPtr SelCenter => ObjC.GetSelector("center");
+        public static IntPtr SelMakeKeyAndOrderFront => ObjC.GetSelector("makeKeyAndOrderFront:");
+        public static IntPtr SelClose => ObjC.GetSelector("close");
+        public static IntPtr SelIsVisible => ObjC.GetSelector("isVisible");
+        public static IntPtr SelSetFrameOrigin => ObjC.GetSelector("setFrameOrigin:");
+        public static IntPtr SelSetContentSize => ObjC.GetSelector("setContentSize:");
+        public static IntPtr SelContentView => ObjC.GetSelector("contentView");
+        public static IntPtr SelSetFrame => ObjC.GetSelector("setFrame:");
+        public static IntPtr SelAddSubview => ObjC.GetSelector("addSubview:");
+        public static IntPtr SelRemoveFromSuperview => ObjC.GetSelector("removeFromSuperview");
+        public static IntPtr SelSetAutoresizingMask => ObjC.GetSelector("setAutoresizingMask:");
+        public static IntPtr SelInitWithFrameConfiguration => ObjC.GetSelector("initWithFrame:configuration:");
+        public static IntPtr SelLoadRequest => ObjC.GetSelector("loadRequest:");
+        public static IntPtr SelReload => ObjC.GetSelector("reload");
+        public static IntPtr SelStopLoading => ObjC.GetSelector("stopLoading");
+        public static IntPtr SelGoBack => ObjC.GetSelector("goBack");
+        public static IntPtr SelGoForward => ObjC.GetSelector("goForward");
+        public static IntPtr SelSetCustomUserAgent => ObjC.GetSelector("setCustomUserAgent:");
+        public static IntPtr SelRespondsToSelector => ObjC.GetSelector("respondsToSelector:");
+        public static IntPtr SelSetPageZoom => ObjC.GetSelector("setPageZoom:");
+        public static IntPtr SelPrint => ObjC.GetSelector("print:");
+        public static IntPtr SelBounds => ObjC.GetSelector("bounds");
+        public static IntPtr SelDataWithPdfInsideRect => ObjC.GetSelector("dataWithPDFInsideRect:");
+        public static IntPtr SelWriteToFileAtomically => ObjC.GetSelector("writeToFile:atomically:");
+    }
 
     private readonly List<Uri> _history = [];
     private readonly bool _useNative;
@@ -69,20 +72,6 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
     private IntPtr _contentViewHandle;
     private IntPtr _webViewHandle;
     private IntPtr _configurationHandle;
-
-    private static IntPtr GetClass(string name)
-    {
-        return OperatingSystem.IsMacOS()
-            ? ObjC.GetClass(name)
-            : IntPtr.Zero;
-    }
-
-    private static IntPtr GetSelector(string name)
-    {
-        return OperatingSystem.IsMacOS()
-            ? ObjC.GetSelector(name)
-            : IntPtr.Zero;
-    }
 
     public MacOSNativeWebDialogBackend()
     {
@@ -106,7 +95,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         {
             if (_useNative && _windowHandle != IntPtr.Zero && ObjC.IsMainThread())
             {
-                _isVisible = ObjC.SendBool(_windowHandle, SelIsVisible);
+                _isVisible = ObjC.SendBool(_windowHandle, NativeSymbols.SelIsVisible);
             }
 
             return _isVisible;
@@ -159,8 +148,8 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         if (_useNative && _windowHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
             ApplyWindowOptions(options);
-            ObjC.SendVoidIntPtr(_windowHandle, SelMakeKeyAndOrderFront, IntPtr.Zero);
-            _isVisible = ObjC.SendBool(_windowHandle, SelIsVisible);
+            ObjC.SendVoidIntPtr(_windowHandle, NativeSymbols.SelMakeKeyAndOrderFront, IntPtr.Zero);
+            _isVisible = ObjC.SendBool(_windowHandle, NativeSymbols.SelIsVisible);
         }
         else
         {
@@ -182,7 +171,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _windowHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            ObjC.SendVoid(_windowHandle, SelClose);
+            ObjC.SendVoid(_windowHandle, NativeSymbols.SelClose);
         }
 
         _isVisible = false;
@@ -196,7 +185,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _windowHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            ObjC.SendVoidCGPoint(_windowHandle, SelSetFrameOrigin, new CGPoint(left, top));
+            ObjC.SendVoidCGPoint(_windowHandle, NativeSymbols.SelSetFrameOrigin, new CGPoint(left, top));
         }
     }
 
@@ -212,7 +201,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _windowHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            ObjC.SendVoidCGSize(_windowHandle, SelSetContentSize, new CGSize(width, height));
+            ObjC.SendVoidCGSize(_windowHandle, NativeSymbols.SelSetContentSize, new CGSize(width, height));
         }
     }
 
@@ -271,7 +260,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _webViewHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            _ = ObjC.SendIntPtr(_webViewHandle, SelReload);
+            _ = ObjC.SendIntPtr(_webViewHandle, NativeSymbols.SelReload);
         }
 
         NavigationStarted?.Invoke(this, new NativeWebViewNavigationStartedEventArgs(_currentUrl, isRedirected: false));
@@ -285,7 +274,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _webViewHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            ObjC.SendVoid(_webViewHandle, SelStopLoading);
+            ObjC.SendVoid(_webViewHandle, NativeSymbols.SelStopLoading);
         }
     }
 
@@ -304,7 +293,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _webViewHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            _ = ObjC.SendIntPtr(_webViewHandle, SelGoBack);
+            _ = ObjC.SendIntPtr(_webViewHandle, NativeSymbols.SelGoBack);
         }
 
         NavigationCompleted?.Invoke(this, new NativeWebViewNavigationCompletedEventArgs(_currentUrl, isSuccess: true, httpStatusCode: 200));
@@ -325,7 +314,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         if (_useNative && _webViewHandle != IntPtr.Zero && ObjC.IsMainThread())
         {
-            _ = ObjC.SendIntPtr(_webViewHandle, SelGoForward);
+            _ = ObjC.SendIntPtr(_webViewHandle, NativeSymbols.SelGoForward);
         }
 
         NavigationCompleted?.Invoke(this, new NativeWebViewNavigationCompletedEventArgs(_currentUrl, isSuccess: true, httpStatusCode: 200));
@@ -448,9 +437,9 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         ZoomFactor = zoomFactor;
 
         if (_useNative && _webViewHandle != IntPtr.Zero && ObjC.IsMainThread() &&
-            ObjC.SendBoolIntPtr(_webViewHandle, SelRespondsToSelector, SelSetPageZoom))
+            ObjC.SendBoolIntPtr(_webViewHandle, NativeSymbols.SelRespondsToSelector, NativeSymbols.SelSetPageZoom))
         {
-            ObjC.SendVoidDouble(_webViewHandle, SelSetPageZoom, zoomFactor);
+            ObjC.SendVoidDouble(_webViewHandle, NativeSymbols.SelSetPageZoom, zoomFactor);
         }
     }
 
@@ -466,7 +455,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
             var userAgentHandle = userAgent is null
                 ? IntPtr.Zero
                 : CreateNSString(userAgent);
-            ObjC.SendVoidIntPtr(_webViewHandle, SelSetCustomUserAgent, userAgentHandle);
+            ObjC.SendVoidIntPtr(_webViewHandle, NativeSymbols.SelSetCustomUserAgent, userAgentHandle);
         }
     }
 
@@ -514,26 +503,26 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         {
             if (_windowHandle != IntPtr.Zero)
             {
-                ObjC.SendVoid(_windowHandle, SelClose);
+                ObjC.SendVoid(_windowHandle, NativeSymbols.SelClose);
             }
 
             if (_webViewHandle != IntPtr.Zero)
             {
-                ObjC.SendVoid(_webViewHandle, SelStopLoading);
-                ObjC.SendVoid(_webViewHandle, SelRemoveFromSuperview);
-                ObjC.SendVoid(_webViewHandle, SelRelease);
+                ObjC.SendVoid(_webViewHandle, NativeSymbols.SelStopLoading);
+                ObjC.SendVoid(_webViewHandle, NativeSymbols.SelRemoveFromSuperview);
+                ObjC.SendVoid(_webViewHandle, NativeSymbols.SelRelease);
                 _webViewHandle = IntPtr.Zero;
             }
 
             if (_configurationHandle != IntPtr.Zero)
             {
-                ObjC.SendVoid(_configurationHandle, SelRelease);
+                ObjC.SendVoid(_configurationHandle, NativeSymbols.SelRelease);
                 _configurationHandle = IntPtr.Zero;
             }
 
             if (_windowHandle != IntPtr.Zero)
             {
-                ObjC.SendVoid(_windowHandle, SelRelease);
+                ObjC.SendVoid(_windowHandle, NativeSymbols.SelRelease);
                 _windowHandle = IntPtr.Zero;
             }
 
@@ -570,8 +559,8 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         var frame = new CGRect(new CGPoint(left, top), new CGSize(width, height));
 
         _windowHandle = ObjC.SendIntPtrCGRectNUIntNIntBool(
-            ObjC.SendIntPtr(NSWindowClass, SelAlloc),
-            SelInitWithContentRectStyleMaskBackingDefer,
+            ObjC.SendIntPtr(NativeSymbols.NSWindowClass, NativeSymbols.SelAlloc),
+            NativeSymbols.SelInitWithContentRectStyleMaskBackingDefer,
             frame,
             windowStyleMask,
             NSBackingStoreBuffered,
@@ -582,18 +571,18 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
             throw new InvalidOperationException("Failed to create NSWindow for NativeWebDialog.");
         }
 
-        ObjC.SendVoidBool(_windowHandle, SelSetReleasedWhenClosed, false);
+        ObjC.SendVoidBool(_windowHandle, NativeSymbols.SelSetReleasedWhenClosed, false);
 
-        _contentViewHandle = ObjC.SendIntPtr(_windowHandle, SelContentView);
+        _contentViewHandle = ObjC.SendIntPtr(_windowHandle, NativeSymbols.SelContentView);
         if (_contentViewHandle == IntPtr.Zero)
         {
             throw new InvalidOperationException("Failed to resolve NSWindow contentView.");
         }
 
-        _configurationHandle = ObjC.SendIntPtr(ObjC.SendIntPtr(WKWebViewConfigurationClass, SelAlloc), SelInit);
+        _configurationHandle = ObjC.SendIntPtr(ObjC.SendIntPtr(NativeSymbols.WKWebViewConfigurationClass, NativeSymbols.SelAlloc), NativeSymbols.SelInit);
         _webViewHandle = ObjC.SendIntPtrCGRectIntPtr(
-            ObjC.SendIntPtr(WKWebViewClass, SelAlloc),
-            SelInitWithFrameConfiguration,
+            ObjC.SendIntPtr(NativeSymbols.WKWebViewClass, NativeSymbols.SelAlloc),
+            NativeSymbols.SelInitWithFrameConfiguration,
             CGRect.Zero,
             _configurationHandle);
 
@@ -602,21 +591,21 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
             throw new InvalidOperationException("Failed to create WKWebView for NativeWebDialog.");
         }
 
-        ObjC.SendVoidIntPtr(_contentViewHandle, SelAddSubview, _webViewHandle);
-        ObjC.SendVoidNUInt(_webViewHandle, SelSetAutoresizingMask, NSViewWidthSizable | NSViewHeightSizable);
-        var contentBounds = ObjC.SendCGRect(_contentViewHandle, SelBounds);
-        ObjC.SendVoidCGRect(_webViewHandle, SelSetFrame, contentBounds);
+        ObjC.SendVoidIntPtr(_contentViewHandle, NativeSymbols.SelAddSubview, _webViewHandle);
+        ObjC.SendVoidNUInt(_webViewHandle, NativeSymbols.SelSetAutoresizingMask, NSViewWidthSizable | NSViewHeightSizable);
+        var contentBounds = ObjC.SendCGRect(_contentViewHandle, NativeSymbols.SelBounds);
+        ObjC.SendVoidCGRect(_webViewHandle, NativeSymbols.SelSetFrame, contentBounds);
 
         if (!string.IsNullOrWhiteSpace(UserAgentString))
         {
             var userAgentHandle = CreateNSString(UserAgentString);
-            ObjC.SendVoidIntPtr(_webViewHandle, SelSetCustomUserAgent, userAgentHandle);
+            ObjC.SendVoidIntPtr(_webViewHandle, NativeSymbols.SelSetCustomUserAgent, userAgentHandle);
         }
 
         if (ZoomFactor > 0 &&
-            ObjC.SendBoolIntPtr(_webViewHandle, SelRespondsToSelector, SelSetPageZoom))
+            ObjC.SendBoolIntPtr(_webViewHandle, NativeSymbols.SelRespondsToSelector, NativeSymbols.SelSetPageZoom))
         {
-            ObjC.SendVoidDouble(_webViewHandle, SelSetPageZoom, ZoomFactor);
+            ObjC.SendVoidDouble(_webViewHandle, NativeSymbols.SelSetPageZoom, ZoomFactor);
         }
 
         if (_currentUrl is { IsAbsoluteUri: true } initialUri)
@@ -638,38 +627,38 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
             : normalized.Title;
 
         var titleHandle = CreateNSString(title);
-        ObjC.SendVoidIntPtr(_windowHandle, SelSetTitle, titleHandle);
+        ObjC.SendVoidIntPtr(_windowHandle, NativeSymbols.SelSetTitle, titleHandle);
 
         if (normalized.Width > 0 && normalized.Height > 0)
         {
-            ObjC.SendVoidCGSize(_windowHandle, SelSetContentSize, new CGSize(normalized.Width, normalized.Height));
+            ObjC.SendVoidCGSize(_windowHandle, NativeSymbols.SelSetContentSize, new CGSize(normalized.Width, normalized.Height));
         }
 
         if (normalized.CenterOnParent)
         {
-            ObjC.SendVoid(_windowHandle, SelCenter);
+            ObjC.SendVoid(_windowHandle, NativeSymbols.SelCenter);
         }
         else
         {
-            ObjC.SendVoidCGPoint(_windowHandle, SelSetFrameOrigin, new CGPoint(normalized.Left, normalized.Top));
+            ObjC.SendVoidCGPoint(_windowHandle, NativeSymbols.SelSetFrameOrigin, new CGPoint(normalized.Left, normalized.Top));
         }
     }
 
     private void LoadUrl(Uri uri)
     {
-        var nsUrl = CreateNSStringBackedObject(NSURLClass, SelUrlWithString, uri.AbsoluteUri);
+        var nsUrl = CreateNSStringBackedObject(NativeSymbols.NSURLClass, NativeSymbols.SelUrlWithString, uri.AbsoluteUri);
         if (nsUrl == IntPtr.Zero)
         {
             throw new InvalidOperationException("Failed to create NSURL from URI.");
         }
 
-        var request = ObjC.SendIntPtrIntPtr(NSURLRequestClass, SelRequestWithUrl, nsUrl);
+        var request = ObjC.SendIntPtrIntPtr(NativeSymbols.NSURLRequestClass, NativeSymbols.SelRequestWithUrl, nsUrl);
         if (request == IntPtr.Zero)
         {
             throw new InvalidOperationException("Failed to create NSURLRequest.");
         }
 
-        _ = ObjC.SendIntPtrIntPtr(_webViewHandle, SelLoadRequest, request);
+        _ = ObjC.SendIntPtrIntPtr(_webViewHandle, NativeSymbols.SelLoadRequest, request);
     }
 
     private static IntPtr CreateNSStringBackedObject(IntPtr classHandle, IntPtr selector, string value)
@@ -682,7 +671,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
     {
         try
         {
-            if (!ObjC.SendBoolIntPtr(_webViewHandle, SelRespondsToSelector, SelDataWithPdfInsideRect))
+            if (!ObjC.SendBoolIntPtr(_webViewHandle, NativeSymbols.SelRespondsToSelector, NativeSymbols.SelDataWithPdfInsideRect))
             {
                 return new NativeWebViewPrintResult(
                     NativeWebViewPrintStatus.NotSupported,
@@ -696,15 +685,15 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
                 Directory.CreateDirectory(directory);
             }
 
-            var bounds = ObjC.SendCGRect(_webViewHandle, SelBounds);
-            var pdfData = ObjC.SendIntPtrCGRect(_webViewHandle, SelDataWithPdfInsideRect, bounds);
+            var bounds = ObjC.SendCGRect(_webViewHandle, NativeSymbols.SelBounds);
+            var pdfData = ObjC.SendIntPtrCGRect(_webViewHandle, NativeSymbols.SelDataWithPdfInsideRect, bounds);
             if (pdfData == IntPtr.Zero)
             {
                 return new NativeWebViewPrintResult(NativeWebViewPrintStatus.Failed, "WKWebView returned no PDF data.");
             }
 
             var pathHandle = CreateNSString(fullPath);
-            var written = ObjC.SendBoolIntPtrBool(pdfData, SelWriteToFileAtomically, pathHandle, true);
+            var written = ObjC.SendBoolIntPtrBool(pdfData, NativeSymbols.SelWriteToFileAtomically, pathHandle, true);
             return written
                 ? new NativeWebViewPrintResult(NativeWebViewPrintStatus.Success)
                 : new NativeWebViewPrintResult(NativeWebViewPrintStatus.Failed, $"Failed to write PDF to '{fullPath}'.");
@@ -722,12 +711,12 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
             return false;
         }
 
-        if (!ObjC.SendBoolIntPtr(_webViewHandle, SelRespondsToSelector, SelPrint))
+        if (!ObjC.SendBoolIntPtr(_webViewHandle, NativeSymbols.SelRespondsToSelector, NativeSymbols.SelPrint))
         {
             return false;
         }
 
-        ObjC.SendVoidIntPtr(_webViewHandle, SelPrint, IntPtr.Zero);
+        ObjC.SendVoidIntPtr(_webViewHandle, NativeSymbols.SelPrint, IntPtr.Zero);
         return true;
     }
 
@@ -736,7 +725,7 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
         var utf8 = Marshal.StringToCoTaskMemUTF8(value);
         try
         {
-            return ObjC.SendIntPtrIntPtr(NSStringClass, SelStringWithUtf8String, utf8);
+            return ObjC.SendIntPtrIntPtr(NativeSymbols.NSStringClass, NativeSymbols.SelStringWithUtf8String, utf8);
         }
         finally
         {
@@ -890,6 +879,11 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         public static IntPtr GetClass(string name)
         {
+            if (!OperatingSystem.IsMacOS())
+            {
+                throw new PlatformNotSupportedException("Objective-C interop is only available on macOS.");
+            }
+
             EnsureFrameworksLoaded();
 
             var handle = objc_getClass(name);
@@ -903,6 +897,11 @@ public sealed class MacOSNativeWebDialogBackend : INativeWebDialogBackend, INati
 
         public static IntPtr GetSelector(string name)
         {
+            if (!OperatingSystem.IsMacOS())
+            {
+                throw new PlatformNotSupportedException("Objective-C interop is only available on macOS.");
+            }
+
             var handle = sel_registerName(name);
             if (handle == IntPtr.Zero)
             {
