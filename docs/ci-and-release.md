@@ -14,7 +14,7 @@ Stages:
 
 1. Quality gate (`dotnet format --verify-no-changes --severity warn`) on Ubuntu.
 2. Changelog fragment validation (`./scripts/validate-changelog-fragments.sh`) on Ubuntu.
-3. Restore, build, and test (`Debug`) on Windows, macOS, and Linux.
+3. Restore, build, and test (`Release`) on Windows, macOS, and Linux.
    - Includes platform prerequisite diagnostics coverage in core tests.
 4. Ubuntu `Release` build plus diagnostics exit-code contract validation and desktop/mobile-browser sample smoke runs.
    - Smoke scripts enable `NATIVEWEBVIEW_DIAGNOSTICS_REQUIRE_READY=1` to fail on blocking diagnostic issues.
@@ -29,8 +29,10 @@ Stages:
    - Includes structured `gateFailures` metadata with remediation recommendations.
    - Includes deterministic evaluation `fingerprint` and schema version (`fingerprintVersion`) for artifact correlation and drift detection.
    - Conformance artifact directory also includes machine-readable `exit-code-contract-summary.json`.
-10. Package dry-run (`Release`) on Ubuntu.
-11. Upload test, package, and diagnostics artifacts.
+10. Pack all ship-ready NuGet packages with `.snupkg` symbols.
+11. Validate package archives with `scripts/validate-nuget-packages.sh`.
+   - Verifies `.nupkg`/`.snupkg` presence, packed README/license, nuspec metadata, and expected inter-package dependencies.
+12. Upload test, package, and diagnostics artifacts.
 
 ## Tag release
 
@@ -55,11 +57,13 @@ Stages:
    - Includes structured `gateFailures` metadata with remediation recommendations.
    - Includes deterministic evaluation `fingerprint` and schema version (`fingerprintVersion`) for artifact correlation and drift detection.
 9. Pack all NuGet packages with `.snupkg` symbols.
-10. Generate release notes from changelog fragments.
-11. Append diagnostics + regression + gate-evaluation + exit-code conformance markdown summaries to release notes.
-12. Upload package, release-note, and diagnostics artifacts.
-13. Push `.nupkg` and `.snupkg` to nuget.org when `NUGET_API_KEY` secret is configured.
-14. Create a GitHub release using generated release notes and attached artifacts.
+10. Validate release packages with `scripts/validate-nuget-packages.sh`.
+11. Generate release notes from changelog fragments.
+12. Append diagnostics + regression + gate-evaluation + exit-code conformance markdown summaries to release notes.
+13. Append NuGet package validation summary to release notes and workflow summary.
+14. Upload package, release-note, and diagnostics artifacts.
+15. Push `.nupkg` and `.snupkg` to nuget.org when `NUGET_API_KEY` secret is configured.
+16. Create a GitHub release using generated release notes and attached artifacts.
 
 ## Docs Site Workflow
 
@@ -101,6 +105,7 @@ dotnet build NativeWebView.sln -c Release
 ./scripts/run-platform-diagnostics-report.sh --configuration Release --no-build --platform all --output artifacts/diagnostics/platform-diagnostics-report.json --markdown-output artifacts/diagnostics/platform-diagnostics-report.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --blocking-baseline-output artifacts/diagnostics/current-blocking-baseline.txt --comparison-markdown-output artifacts/diagnostics/blocking-regression.md --comparison-json-output artifacts/diagnostics/blocking-regression.json --comparison-evaluation-markdown-output artifacts/diagnostics/gate-evaluation.md --require-baseline-sync --allow-not-ready
 ./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
 dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages
+bash ./scripts/validate-nuget-packages.sh --package-dir artifacts/packages --markdown-output artifacts/packages/package-validation.md
 ```
 
 When fingerprint baseline gating is enabled, conformance outputs include `fingerprint-baseline-comparison.md` and `fingerprint-baseline-comparison.json` under the exit-code contract output directory.

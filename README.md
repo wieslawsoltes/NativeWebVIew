@@ -1,17 +1,16 @@
 # NativeWebView
 
-NativeWebView provides a native-webview-first control stack for Avalonia without bundling Chromium.
+Native webview stack for Avalonia that stays on top of platform-native engines instead of bundling Chromium.
 
-## What You Get
+[![.NET 8](https://img.shields.io/badge/.NET-8-512BD4)](https://dotnet.microsoft.com)
+[![Avalonia](https://img.shields.io/badge/Avalonia-11.3-1f6feb)](https://avaloniaui.net)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- `NativeWebView` embedded control facade.
-- `NativeWebDialog` dialog/window browser facade.
-- `WebAuthenticationBroker` cross-platform auth facade.
-- Shared feature/capability model and backend factory.
-- Platform-specific backend packages for Windows, macOS, Linux, iOS, Android, and Browser.
-- Optional airspace-mitigation rendering modes (`GpuSurface`, `Offscreen`) in the `NativeWebView` control.
+## NuGet Packages
 
-## Package Layout
+End-user installs are typically `NativeWebView` plus the platform package for the target runtime. `NativeWebView.Dialog` and `NativeWebView.Auth` are optional facades, while `Core` and `Interop` are primarily composition units and transitive dependencies.
+
+### Package Layout
 
 | Package | Purpose |
 | --- | --- |
@@ -27,6 +26,15 @@ NativeWebView provides a native-webview-first control stack for Avalonia without
 | `NativeWebView.Platform.Android` | Android backend registration and implementation. |
 | `NativeWebView.Platform.Browser` | Browser backend registration and implementation. |
 
+## Features
+
+- `NativeWebView` control for embedded native browser surfaces inside Avalonia.
+- `NativeWebDialog` facade for dialog and popup browser workflows.
+- `WebAuthenticationBroker` facade for OAuth and interactive sign-in.
+- Platform backends for Windows, macOS, Linux, iOS, Android, and Browser.
+- Optional airspace-mitigation modes: `Embedded`, `GpuSurface`, and `Offscreen`.
+- Diagnostics, capability reporting, render-frame export, integrity metadata, and smoke-testable sample apps.
+
 ## Platform Support Matrix
 
 | Platform | Embedded WebView | GPU Surface Mode | Offscreen Mode | Dialog | Authentication Broker | Native Handles |
@@ -38,17 +46,21 @@ NativeWebView provides a native-webview-first control stack for Avalonia without
 | Android | Yes | Yes | Yes | No | Yes | Yes |
 | Browser | Yes | Yes | Yes | No | Yes | Yes |
 
-## Install
+## Installation
 
-Add the shared package and the platform package(s) you need:
+Install the Avalonia control package and the platform backend that matches the runtime you ship:
 
 ```bash
 dotnet add package NativeWebView
-dotnet add package NativeWebView.Core
 dotnet add package NativeWebView.Platform.Windows
 ```
 
-Use the platform package that matches your target runtime.
+Optional packages:
+
+- `dotnet add package NativeWebView.Dialog`
+- `dotnet add package NativeWebView.Auth`
+
+Swap `NativeWebView.Platform.Windows` for `NativeWebView.Platform.macOS`, `NativeWebView.Platform.Linux`, `NativeWebView.Platform.iOS`, `NativeWebView.Platform.Android`, or `NativeWebView.Platform.Browser` as needed.
 
 ## Quick Start
 
@@ -72,39 +84,65 @@ webView.RenderFramesPerSecond = 30;
 webView.Navigate("https://example.com");
 ```
 
-## Airspace Mitigation Modes
+## Rendering Modes
 
-- `RenderMode = Embedded`: native child host mode (highest interaction fidelity).
-- `RenderMode = GpuSurface`: draws web frames into a reusable Avalonia surface.
-- `RenderMode = Offscreen`: draws web frames captured offscreen.
-- Runtime checks:
-  - `webView.SupportsRenderMode(mode)`
-  - `webView.IsUsingSyntheticFrameSource`
-  - `webView.RenderDiagnosticsMessage`
-  - `webView.RenderStatistics` / `webView.GetRenderStatisticsSnapshot()`
-  - `webView.ResetRenderStatistics()`
-  - `var capturedFrame = await webView.CaptureRenderFrameAsync()`
-  - `await webView.SaveRenderFrameAsync("artifacts/frame.png")`
-  - `await webView.SaveRenderFrameWithMetadataAsync("artifacts/frame.png", "artifacts/frame.json")`
-  - `var sidecar = await NativeWebViewRenderFrameMetadataSerializer.ReadFromFileAsync("artifacts/frame.json")`
-  - `if (capturedFrame is not null) NativeWebViewRenderFrameMetadataSerializer.TryVerifyIntegrity(capturedFrame, sidecar, out var integrityError)`
-  - frame metadata: `FrameId`, `CapturedAtUtc`, `RenderMode`, `Origin`
-  - sidecar integrity metadata: `PixelDataLength`, `PixelDataSha256` (schema `FormatVersion = 2`, BGRA hash excludes row-stride padding bytes; verification requires matching `FormatVersion`)
-  - capture statistics: attempts/success/failure/skip and frame-source breakdown (`SyntheticFrameCount`, `NativeFrameCount`)
+- `Embedded` keeps the native child view hosted directly for maximum fidelity.
+- `GpuSurface` captures frames into a reusable Avalonia-backed surface.
+- `Offscreen` captures frames offscreen for fully managed composition paths.
 
-## Desktop Feature Sample
+Useful runtime APIs:
 
-Run the Avalonia desktop feature explorer (default mode):
+- `webView.SupportsRenderMode(mode)`
+- `webView.IsUsingSyntheticFrameSource`
+- `webView.RenderDiagnosticsMessage`
+- `webView.RenderStatistics` and `webView.GetRenderStatisticsSnapshot()`
+- `webView.ResetRenderStatistics()`
+- `await webView.CaptureRenderFrameAsync()`
+- `await webView.SaveRenderFrameAsync("artifacts/frame.png")`
+- `await webView.SaveRenderFrameWithMetadataAsync("artifacts/frame.png", "artifacts/frame.json")`
+
+Render sidecar metadata includes `FrameId`, `CapturedAtUtc`, `RenderMode`, `Origin`, `PixelDataLength`, and `PixelDataSha256`. Integrity verification requires matching `FormatVersion`.
+
+## Samples
+
+Run the desktop feature explorer:
 
 ```bash
 dotnet run --project samples/NativeWebView.Sample.Desktop/NativeWebView.Sample.Desktop.csproj -c Debug
 ```
 
-Run the deterministic smoke matrix mode used by CI:
+Run the deterministic smoke matrix used by CI:
 
 ```bash
 dotnet run --project samples/NativeWebView.Sample.Desktop/NativeWebView.Sample.Desktop.csproj -c Debug -- --smoke
 ```
+
+## Diagnostics and Release Validation
+
+Runtime readiness check:
+
+```csharp
+NativeWebViewRuntime.EnsureCurrentPlatformRegistered();
+var diagnostics = NativeWebViewRuntime.GetCurrentPlatformDiagnostics();
+
+if (!diagnostics.IsReady)
+{
+    throw new InvalidOperationException(
+        $"Platform prerequisites are not satisfied for {diagnostics.Platform}.");
+}
+
+NativeWebViewDiagnosticsValidator.EnsureReady(diagnostics);
+```
+
+Generate release-facing diagnostics and gate artifacts:
+
+```bash
+./scripts/run-platform-diagnostics-report.sh --configuration Release --platform all --output artifacts/diagnostics/platform-diagnostics-report.json --markdown-output artifacts/diagnostics/platform-diagnostics-report.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --comparison-markdown-output artifacts/diagnostics/blocking-regression.md --comparison-json-output artifacts/diagnostics/blocking-regression.json --comparison-evaluation-markdown-output artifacts/diagnostics/gate-evaluation.md --require-baseline-sync --allow-not-ready
+./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
+./scripts/validate-nuget-packages.sh --package-dir artifacts/packages --markdown-output artifacts/packages/package-validation.md
+```
+
+`blocking-regression.json` includes deterministic evaluation fingerprints and structured `gateFailures` metadata for automation and release triage. Package validation verifies every `.nupkg` and `.snupkg`, packed README/license files, nuspec metadata, and expected package dependencies.
 
 ## Documentation
 
@@ -124,78 +162,23 @@ dotnet run --project samples/NativeWebView.Sample.Desktop/NativeWebView.Sample.D
 - [Platform Notes: Browser](docs/platforms/browser.md)
 - [CI and Release](docs/ci-and-release.md)
 
-## Runtime Diagnostics
+## CI and Release
 
-```csharp
-NativeWebViewRuntime.EnsureCurrentPlatformRegistered();
-var diagnostics = NativeWebViewRuntime.GetCurrentPlatformDiagnostics();
+GitHub Actions workflows:
 
-if (!diagnostics.IsReady)
-{
-    throw new InvalidOperationException(
-        $"Platform prerequisites are not satisfied for {diagnostics.Platform}.");
-}
+- `CI`: quality gate, matrix build/test, release pack, diagnostics/report artifacts, and NuGet package validation.
+- `Release`: tag-driven `v*` pack/publish flow with release notes, diagnostics artifacts, package validation, NuGet push, and GitHub Release publishing.
+- `Docs`: strict MkDocs build and Pages deployment.
+- `Extended Validation`: scheduled/manual Playwright, iOS simulator, and Android emulator validation.
 
-NativeWebViewDiagnosticsValidator.EnsureReady(diagnostics);
-```
-
-Generate a cross-platform diagnostics JSON artifact:
-
-```bash
-./scripts/run-platform-diagnostics-report.sh --configuration Release --platform all --output artifacts/diagnostics/platform-diagnostics-report.json --markdown-output artifacts/diagnostics/platform-diagnostics-report.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --comparison-markdown-output artifacts/diagnostics/blocking-regression.md --comparison-json-output artifacts/diagnostics/blocking-regression.json --comparison-evaluation-markdown-output artifacts/diagnostics/gate-evaluation.md --require-baseline-sync --allow-not-ready
-./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
-```
-
-`blocking-regression.json` includes deterministic evaluation fingerprint metadata (`fingerprintVersion`, `fingerprint`) plus structured `gateFailures` (`kind`, `exitCode`, `message`, `recommendation`) for automation and triage tooling.
-`validate-diagnostics-exit-code-contract.sh` also emits `fingerprint-current.txt` and, when `--fingerprint-baseline` is provided, drift summaries in `fingerprint-baseline-comparison.md` and `fingerprint-baseline-comparison.json`.
-Conformance artifacts include `exit-code-contract-summary.json` with per-scenario expected/actual exit codes, pass/fail status, and fingerprints.
-
-Refresh baseline when intentional blocking diagnostics changes are accepted:
-
-```bash
-./scripts/update-blocking-baseline.sh --configuration Release --platform all --output ci/baselines/blocking-issues-baseline.txt
-./scripts/update-diagnostics-fingerprint-baseline.sh --configuration Release --output ci/baselines/diagnostics-fingerprint-baseline.txt
-```
-
-## Extended Validation
-
-The repository includes `.github/workflows/extended-validation.yml` for scheduled/manual checks:
-
-- Browser docs smoke checks using Playwright (`scripts/run-browser-playwright-smoke.sh`).
-- iOS contract smoke with simulator boot (`scripts/run-ios-simulator-contract-smoke.sh`).
-- Android contract smoke with emulator runner (`scripts/run-android-emulator-contract-smoke.sh`).
-
-## Changelog Fragments and Release Notes
-
-Releases use changelog fragments from `changelog/fragments` to generate release notes.
-
-Validate fragments:
-
-```bash
-./scripts/validate-changelog-fragments.sh
-```
-
-Generate release notes preview:
-
-```bash
-./scripts/build-release-notes.sh --version 0.1.0 --output artifacts/release-notes.md
-```
-
-## Docs Site
-
-The documentation site is built with MkDocs:
-
-```bash
-python -m pip install -r docs/requirements.txt
-mkdocs build --strict
-```
-
-## Build and Validate
+Local release dry run:
 
 ```bash
 dotnet restore NativeWebView.sln
-dotnet build NativeWebView.sln -c Debug
-dotnet test NativeWebView.sln -c Debug
+dotnet build NativeWebView.sln -c Release
+dotnet test NativeWebView.sln -c Release --no-build
+dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages
+bash ./scripts/validate-nuget-packages.sh --package-dir artifacts/packages --markdown-output artifacts/packages/package-validation.md
 ```
 
 ## License
