@@ -1,35 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference/lunet-docs-pipeline</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/native-handle-interop</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/platform-prerequisites</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/render-modes</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
@@ -37,11 +9,51 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/installation</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/environment-and-controller-options</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/native-handle-interop</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/platform-prerequisites</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/ci-and-release</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
     <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference/license</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/sample-feature-explorer</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/platform-diagnostics-report</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference/lunet-docs-pipeline</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference/package-layout</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
@@ -49,7 +61,7 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference/package-layout</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/reference</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
@@ -65,10 +77,6 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/installation</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
     <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/platforms/linux</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
@@ -77,15 +85,11 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/overview</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
     <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/platforms</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/platform-diagnostics-report</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/render-modes</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
@@ -93,23 +97,11 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/diagnostics/ci-and-release</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/quickstart</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/nativewebdialog</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/nativewebview</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/webauthenticationbroker</loc>
-    <lastmod>2026-03-10</lastmod>
-  </url>
-  <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/sample-feature-explorer</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
@@ -117,11 +109,19 @@
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/quickstart</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/nativewebdialog</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
   <url>
-    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/rendering/environment-and-controller-options</loc>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/webauthenticationbroker</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/controls/nativewebview</loc>
+    <lastmod>2026-03-10</lastmod>
+  </url>
+  <url>
+    <loc>https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/articles/getting-started/overview</loc>
     <lastmod>2026-03-10</lastmod>
   </url>
 </urlset>
