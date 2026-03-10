@@ -146,21 +146,13 @@ Generate release-facing diagnostics and gate artifacts:
 
 ## Documentation
 
-- [Quickstart](docs/quickstart.md)
-- [NativeWebView API](docs/nativewebview.md)
-- [NativeWebDialog API](docs/nativewebdialog.md)
-- [WebAuthenticationBroker API](docs/webauthenticationbroker.md)
-- [Environment Options](docs/interop/environment-options.md)
-- [Native Handle Interop](docs/interop/native-browser-interop.md)
-- [Platform Prerequisites and Diagnostics](docs/platform-prerequisites.md)
-- [Platform Diagnostics Report](docs/platform-diagnostics-report.md)
-- [Platform Notes: Windows](docs/platforms/windows.md)
-- [Platform Notes: macOS](docs/platforms/macos.md)
-- [Platform Notes: Linux](docs/platforms/linux.md)
-- [Platform Notes: iOS](docs/platforms/ios.md)
-- [Platform Notes: Android](docs/platforms/android.md)
-- [Platform Notes: Browser](docs/platforms/browser.md)
-- [CI and Release](docs/ci-and-release.md)
+- Hosted docs: [wieslawsoltes.github.io/NativeWebVIew](https://wieslawsoltes.github.io/NativeWebVIew/)
+- Getting started: [Quickstart](https://wieslawsoltes.github.io/NativeWebVIew/articles/getting-started/quickstart/)
+- Control surface: [NativeWebView](https://wieslawsoltes.github.io/NativeWebVIew/articles/controls/nativewebview/)
+- Rendering and interop: [Render Modes](https://wieslawsoltes.github.io/NativeWebVIew/articles/rendering/render-modes/)
+- Platform notes: [Platforms](https://wieslawsoltes.github.io/NativeWebVIew/articles/platforms/)
+- Diagnostics and operations: [Diagnostics](https://wieslawsoltes.github.io/NativeWebVIew/articles/diagnostics/)
+- API reference: [wieslawsoltes.github.io/NativeWebVIew/api](https://wieslawsoltes.github.io/NativeWebVIew/api)
 
 ## CI and Release
 
@@ -168,7 +160,7 @@ GitHub Actions workflows:
 
 - `CI`: quality gate, matrix build/test, release pack, diagnostics/report artifacts, and NuGet package validation.
 - `Release`: tag-driven `v*` pack/publish flow with release notes, diagnostics artifacts, package validation, NuGet push, and GitHub Release publishing.
-- `Docs`: strict MkDocs build and Pages deployment.
+- `Docs`: Lunet build and GitHub Pages deployment from `site/.lunet/build/www`.
 - `Extended Validation`: scheduled/manual Playwright, iOS simulator, and Android emulator validation.
 
 Local release dry run:
@@ -179,6 +171,13 @@ dotnet build NativeWebView.sln -c Release
 dotnet test NativeWebView.sln -c Release --no-build
 dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages
 bash ./scripts/validate-nuget-packages.sh --package-dir artifacts/packages --markdown-output artifacts/packages/package-validation.md
+```
+
+Local docs run:
+
+```bash
+./build-docs.sh
+./serve-docs.sh
 ```
 
 ## License
