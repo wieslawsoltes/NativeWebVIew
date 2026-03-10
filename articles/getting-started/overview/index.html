@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html data-lunet-theme-mode="system" data-lunet-theme-storage-key="lunet-theme" data-lunet-css-prefix="lunet" lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="lunet 1.0.10.0">
+    <script>(function(){const root=document.documentElement;const key=root.getAttribute("data-lunet-theme-storage-key")||"lunet-theme";const fallback=root.getAttribute("data-lunet-theme-mode")||"system";let stored=null;try{stored=localStorage.getItem(key);}catch(_){stored=null;}const mode=(stored==="light"||stored==="dark"||stored==="system")?stored:fallback;const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;const resolved=mode==="system"?(prefersDark?"dark":"light"):mode;root.setAttribute("data-lunet-theme-mode",mode);root.setAttribute("data-bs-theme",resolved);}());</script>
+    <link rel='icon' href='/NativeWebVIew/favicon.ico' sizes='32x32'>
+    <title>Getting Started with NativeWebView | NativeWebView</title>
+    <link rel="stylesheet" href="/NativeWebVIew/css/lite.css">
+    <script src="/NativeWebVIew/js/lite-defer.js" defer></script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wieslawsoltes">
+<meta name="twitter:title" content="Getting Started with NativeWebView | NativeWebView">
+<meta name="twitter:description" content="Getting Started with NativeWebView NativeWebView is split into a small set of focused packages so you can compose only the browser surface you need: NativeWebView: Avalonia NativeControlHost surface for embedding the native browser view. NativeWebView.Core: controller layer, diagnostics, capability model, and backend abstractions. NativeWebView.Dialog: dialog/window facade for desktop browser windows. NativeWebView.Auth: authentication broker facade for OAuth and sign-in flows. NativeWebView.Interop: native handle contracts and interop structs....">
+<meta name="twitter:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta name="twitter:image:alt" content="Getting Started with NativeWebView | NativeWebView">
+<meta property="og:title" content="Getting Started with NativeWebView | NativeWebView">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://wieslawsoltes.github.io/NativeWebVIew">
+<meta property="og:description" content="Getting Started with NativeWebView NativeWebView is split into a small set of focused packages so you can compose only the browser surface you need: NativeWebView: Avalonia NativeControlHost surface for embedding the native browser view. NativeWebView.Core: controller layer, diagnostics, capability model, and backend abstractions. NativeWebView.Dialog: dialog/window facade for desktop browser windows. NativeWebView.Auth: authentication broker facade for OAuth and sign-in flows. NativeWebView.Interop: native handle contracts and interop structs....">
+<meta property="og:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta property="og:image:alt" content="Getting Started with NativeWebView | NativeWebView">
+  </head>
+  <body>
+
+    <div id="lunet" class="container">
+      <nav class="navbar navbar-expand-md sticky-top">
+        <a class="navbar-brand" href="/NativeWebVIew/">
+          <img class="lunet-logo" src="/NativeWebVIew/images/logo.svg" alt="NativeWebView" width="96" height="96">
+          <span class="visually-hidden">Home</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarSupportedContent" class="collapse navbar-collapse justify-content-between">
+<ol id='nav-id-home-0' class='navbar-nav nav-level0 show '>
+  <li id='nav-item-home-1' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/' class='nav-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a></span>  </li>
+  <li id='nav-item-home-2' class='nav-item  active'>
+    <span class='nav-item-row'><a href='/NativeWebVIew/articles/' class='nav-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a></span>  </li>
+  <li id='nav-item-home-3' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/api/' class='nav-link  '><i class='bi bi-braces' aria-hidden='true'></i> API</a></span>  </li>
+</ol>
+          <ol class="navbar-nav flex-grow-1" style="padding-right: 0.5rem;">
+            <li class="nav-item w-100">
+                <div class="lunet-search dropdown w-100">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="search-input" type="search" class="form-control" placeholder="Search... (Alt+s)" aria-label="Search" aria-controls="search-results" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-search-empty-message="Enter words to search..." data-search-no-results-message="No results found.">
+                    <ul id="search-results" class="dropdown-menu w-100 p-0" style="max-height: 50vh;" role="listbox" aria-labelledby="search-input"></ul>
+                  </div>
+                </div>
+            </li>
+          </ol>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0 navbar-right">
+            <div class="dropdown">
+              <button
+                id="theme-mode-toggle"
+                class="btn btn-outline-secondary btn-sm lunet-theme-toggle dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Theme">
+                <i class="bi bi-circle-half" data-lunet-theme-toggle-icon aria-hidden="true"></i>
+                <span
+                  data-lunet-theme-toggle-label
+                  data-theme-system-label="System"
+                  data-theme-light-label="Light"
+                  data-theme-dark-label="Dark">Theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-mode-toggle">
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="system"><i class="bi bi-circle-half me-2"></i>System</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="light"><i class="bi bi-sun-fill me-2"></i>Light</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="dark"><i class="bi bi-moon-stars-fill me-2"></i>Dark</button></li>
+              </ul>
+            </div>
+<ol id='nav-id-home2-0' class='navbar-nav nav-level0 show flex-shrink-0'>
+  <li id='nav-item-home2-1' class='nav-item '>
+    <span class='nav-item-row'><a href='https://github.com/wieslawsoltes/NativeWebVIew' class='nav-link  btn btn-info'><i class="bi bi-github"></i> GitHub</a></span>  </li>
+</ol>
+          </div>
+        </div>
+      </nav>
+      <div class="lunet lunet-articles">
+        <section data-prismjs-copy="" data-prismjs-copy-success="" data-prismjs-copy-timeout="1200" data-copy-tooltip="Copy to Clipboard." data-copy-tooltip-success="Copied!" data-copy-tooltip-error="Failed to copy!">
+
+<div class="container-xxl">
+  <div class="row">
+      <!-- Left sidebar - responsive offcanvas (offcanvas on mobile, visible sidebar on md+) -->
+      <nav id="docs-sidebar-menu" class="col-md-3 col-lg-3 col-xl-3 col-xxl-2 offcanvas-md offcanvas-start sticky-md-top menu-sidebar align-self-start order-1 order-md-0" tabindex="-1" aria-labelledby="docs-sidebar-menu-label" aria-expanded="true">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="docs-sidebar-menu-label">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#docs-sidebar-menu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ol id='menu-id-getting_started-0' class='menu menu-level0 show '>
+            <li id='menu-item-getting_started-1' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/getting-started/' class='menu-link  '>Getting Started</a></span>  </li>
+            <li id='menu-item-getting_started-2' class='menu-item  active'>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/getting-started/overview/' class='menu-link  '>Overview</a></span>  </li>
+            <li id='menu-item-getting_started-3' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/getting-started/installation/' class='menu-link  '>Installation</a></span>  </li>
+            <li id='menu-item-getting_started-4' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/getting-started/quickstart/' class='menu-link  '>Quickstart</a></span>  </li>
+            <li id='menu-item-getting_started-5' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/getting-started/sample-feature-explorer/' class='menu-link  '>Sample Feature Explorer</a></span>  </li>
+          </ol>
+
+        </div>
+      </nav>
+      <!-- Right sidebar (TOC) - collapsible on mobile, visible sidebar on xxl+ -->
+      <aside id="docs-sidebar-toc" class="col-12 col-xxl-2 sticky-xxl-top menu-sidebar align-self-start order-0 order-xxl-2 collapse d-xxl-block" aria-expanded="true">
+        <h3 class="toc-title">On this page</h3>
+        <nav class="js-toc"></nav>
+      </aside>
+      <!-- Main content column -->
+      <div class="col-12 col-md-9 col-lg-9 col-xl-9 col-xxl-8 order-2 order-md-1 js-toc-content">
+        <ol class='breadcrumb'>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/' class='breadcrumb-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/' class='breadcrumb-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/getting-started/' class='breadcrumb-link  '>Getting Started</a>  </li>
+          <li class='breadcrumb-item  active'>
+            Overview  </li>
+        </ol>
+
+        <p id="lunet-results"></p>
+        <!-- Toggle buttons visible only on small screens -->
+        <div class="d-md-none mb-3">
+          <button
+            class="btn btn-outline-secondary btn-sm me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#docs-sidebar-menu"
+            aria-controls="docs-sidebar-menu"
+            aria-label="Toggle docs menu">
+            Menu
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm d-xxl-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#docs-sidebar-toc"
+            aria-controls="docs-sidebar-toc"
+            aria-expanded="false"
+            aria-label="Toggle Table Of Contents">
+            On this page
+          </button>
+        </div>
+<!-- lunet:summarize -->
+<h1 id="getting-started-with-nativewebview">Getting Started with NativeWebView</h1>
+<p>NativeWebView is split into a small set of focused packages so you can compose only the browser surface you need:</p>
+<ul>
+<li><code>NativeWebView</code>: Avalonia <code>NativeControlHost</code> surface for embedding the native browser view.</li>
+<li><code>NativeWebView.Core</code>: controller layer, diagnostics, capability model, and backend abstractions.</li>
+<li><code>NativeWebView.Dialog</code>: dialog/window facade for desktop browser windows.</li>
+<li><code>NativeWebView.Auth</code>: authentication broker facade for OAuth and sign-in flows.</li>
+<li><code>NativeWebView.Interop</code>: native handle contracts and interop structs.</li>
+<li><code>NativeWebView.Platform.*</code>: platform registrations and backend implementations.</li>
+</ul>
+<h2 id="what-you-will-build">What You Will Build</h2>
+<p>By the end of this section you will have:</p>
+<ul>
+<li>An Avalonia window hosting <code>NativeWebView</code>.</li>
+<li>Platform backend registration for the current runtime.</li>
+<li>Runtime readiness checks before first navigation.</li>
+<li>A working choice between <code>Embedded</code>, <code>GpuSurface</code>, and <code>Offscreen</code> render modes.</li>
+</ul>
+<h2 id="recommended-learning-path">Recommended Learning Path</h2>
+<ol>
+<li><a href="/NativeWebVIew/articles/getting-started/installation">Installation</a></li>
+<li><a href="/NativeWebVIew/articles/getting-started/quickstart">Quickstart</a></li>
+<li><a href="/NativeWebVIew/articles/rendering/render-modes">Render Modes</a></li>
+<li><a href="/NativeWebVIew/articles/platforms">Platform Notes</a></li>
+<li><a href="/NativeWebVIew/articles/diagnostics/platform-prerequisites">Platform Prerequisites</a></li>
+</ol>
+<h2 id="pick-the-right-integration-path">Pick the Right Integration Path</h2>
+<p>Choose the primary surface first:</p>
+<ul>
+<li>Use <a href="/NativeWebVIew/articles/controls/nativewebview"><code>NativeWebView</code></a> when the browser must live inside an Avalonia layout.</li>
+<li>Use <a href="/NativeWebVIew/articles/controls/nativewebdialog"><code>NativeWebDialog</code></a> when the browser should live in a separate desktop window.</li>
+<li>Use <a href="/NativeWebVIew/articles/controls/webauthenticationbroker"><code>WebAuthenticationBroker</code></a> when the main goal is an auth callback flow.</li>
+</ul>
+<p>Choose the render mode next:</p>
+<ul>
+<li><code>Embedded</code>: best native fidelity and input behavior.</li>
+<li><code>GpuSurface</code>: composited capture path for reduced airspace issues while staying GPU-backed.</li>
+<li><code>Offscreen</code>: fully managed composition path for overlays, captures, and host-controlled layering.</li>
+</ul>
+<h2 id="operational-model">Operational Model</h2>
+<p>NativeWebView assumes startup validation is part of the application contract:</p>
+<ol>
+<li>Register the current platform backend.</li>
+<li>Read diagnostics for the target platform.</li>
+<li>Fail fast on blocking issues.</li>
+<li>Create and initialize the control or facade.</li>
+<li>Enable optional CI/reporting scripts when shipping packages.</li>
+</ol>
+<h2 id="next">Next</h2>
+<ul>
+<li>Move to <a href="/NativeWebVIew/articles/getting-started/installation">Installation</a> to choose packages.</li>
+<li>Jump to <a href="/NativeWebVIew/articles/getting-started/quickstart">Quickstart</a> if the repository is already referenced locally.</li>
+<li>Use <a href="/NativeWebVIew/articles/getting-started/sample-feature-explorer">Sample Feature Explorer</a> to validate capabilities end to end.</li>
+</ul>
+
+      </div>
+  </div>
+</div>
+
+        </section>
+        <footer>
+          <hr>
+          <p>Copyright &copy; 2026, Wieslaw Soltes aka <a href="https://github.com/wieslawsoltes">wieslawsoltes</a> - Content licensed under the Creative Commons <a href="http://creativecommons.org/licenses/by/2.5/">CC BY 2.5</a> | Site generated by <a href="https://github.com/lunet-io/lunet">lunet</a> hosted on <a href="https://pages.github.com/">GitHub Pages</a></p>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

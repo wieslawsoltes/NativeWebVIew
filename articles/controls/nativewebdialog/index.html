@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html data-lunet-theme-mode="system" data-lunet-theme-storage-key="lunet-theme" data-lunet-css-prefix="lunet" lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="lunet 1.0.10.0">
+    <script>(function(){const root=document.documentElement;const key=root.getAttribute("data-lunet-theme-storage-key")||"lunet-theme";const fallback=root.getAttribute("data-lunet-theme-mode")||"system";let stored=null;try{stored=localStorage.getItem(key);}catch(_){stored=null;}const mode=(stored==="light"||stored==="dark"||stored==="system")?stored:fallback;const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;const resolved=mode==="system"?(prefersDark?"dark":"light"):mode;root.setAttribute("data-lunet-theme-mode",mode);root.setAttribute("data-bs-theme",resolved);}());</script>
+    <link rel='icon' href='/NativeWebVIew/favicon.ico' sizes='32x32'>
+    <title>NativeWebDialog | NativeWebView</title>
+    <link rel="stylesheet" href="/NativeWebVIew/css/lite.css">
+    <script src="/NativeWebVIew/js/lite-defer.js" defer></script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wieslawsoltes">
+<meta name="twitter:title" content="NativeWebDialog | NativeWebView">
+<meta name="twitter:description" content="NativeWebDialog NativeWebDialog is the desktop dialog or window facade for browser workflows that do not belong inside the main Avalonia visual tree. Availability Windows: supported. macOS: supported. Linux: supported. iOS, Android, Browser: unsupported by design in the current implementation. Main Properties Property Purpose IsVisible, CurrentUrl Dialog visibility and current URL. CanGoBack, CanGoForward Navigation history state. IsDevToolsEnabled, IsContextMenuEnabled, IsStatusBarEnabled, IsZoomControlEnabled Desktop browser UI toggles where supported. ZoomFactor, HeaderString, UserAgentString Runtime dialog...">
+<meta name="twitter:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta name="twitter:image:alt" content="NativeWebDialog | NativeWebView">
+<meta property="og:title" content="NativeWebDialog | NativeWebView">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://wieslawsoltes.github.io/NativeWebVIew">
+<meta property="og:description" content="NativeWebDialog NativeWebDialog is the desktop dialog or window facade for browser workflows that do not belong inside the main Avalonia visual tree. Availability Windows: supported. macOS: supported. Linux: supported. iOS, Android, Browser: unsupported by design in the current implementation. Main Properties Property Purpose IsVisible, CurrentUrl Dialog visibility and current URL. CanGoBack, CanGoForward Navigation history state. IsDevToolsEnabled, IsContextMenuEnabled, IsStatusBarEnabled, IsZoomControlEnabled Desktop browser UI toggles where supported. ZoomFactor, HeaderString, UserAgentString Runtime dialog...">
+<meta property="og:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta property="og:image:alt" content="NativeWebDialog | NativeWebView">
+  </head>
+  <body>
+
+    <div id="lunet" class="container">
+      <nav class="navbar navbar-expand-md sticky-top">
+        <a class="navbar-brand" href="/NativeWebVIew/">
+          <img class="lunet-logo" src="/NativeWebVIew/images/logo.svg" alt="NativeWebView" width="96" height="96">
+          <span class="visually-hidden">Home</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarSupportedContent" class="collapse navbar-collapse justify-content-between">
+<ol id='nav-id-home-0' class='navbar-nav nav-level0 show '>
+  <li id='nav-item-home-1' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/' class='nav-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a></span>  </li>
+  <li id='nav-item-home-2' class='nav-item  active'>
+    <span class='nav-item-row'><a href='/NativeWebVIew/articles/' class='nav-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a></span>  </li>
+  <li id='nav-item-home-3' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/api/' class='nav-link  '><i class='bi bi-braces' aria-hidden='true'></i> API</a></span>  </li>
+</ol>
+          <ol class="navbar-nav flex-grow-1" style="padding-right: 0.5rem;">
+            <li class="nav-item w-100">
+                <div class="lunet-search dropdown w-100">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="search-input" type="search" class="form-control" placeholder="Search... (Alt+s)" aria-label="Search" aria-controls="search-results" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-search-empty-message="Enter words to search..." data-search-no-results-message="No results found.">
+                    <ul id="search-results" class="dropdown-menu w-100 p-0" style="max-height: 50vh;" role="listbox" aria-labelledby="search-input"></ul>
+                  </div>
+                </div>
+            </li>
+          </ol>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0 navbar-right">
+            <div class="dropdown">
+              <button
+                id="theme-mode-toggle"
+                class="btn btn-outline-secondary btn-sm lunet-theme-toggle dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Theme">
+                <i class="bi bi-circle-half" data-lunet-theme-toggle-icon aria-hidden="true"></i>
+                <span
+                  data-lunet-theme-toggle-label
+                  data-theme-system-label="System"
+                  data-theme-light-label="Light"
+                  data-theme-dark-label="Dark">Theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-mode-toggle">
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="system"><i class="bi bi-circle-half me-2"></i>System</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="light"><i class="bi bi-sun-fill me-2"></i>Light</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="dark"><i class="bi bi-moon-stars-fill me-2"></i>Dark</button></li>
+              </ul>
+            </div>
+<ol id='nav-id-home2-0' class='navbar-nav nav-level0 show flex-shrink-0'>
+  <li id='nav-item-home2-1' class='nav-item '>
+    <span class='nav-item-row'><a href='https://github.com/wieslawsoltes/NativeWebVIew' class='nav-link  btn btn-info'><i class="bi bi-github"></i> GitHub</a></span>  </li>
+</ol>
+          </div>
+        </div>
+      </nav>
+      <div class="lunet lunet-articles">
+        <section data-prismjs-copy="" data-prismjs-copy-success="" data-prismjs-copy-timeout="1200" data-copy-tooltip="Copy to Clipboard." data-copy-tooltip-success="Copied!" data-copy-tooltip-error="Failed to copy!">
+
+<div class="container-xxl">
+  <div class="row">
+      <!-- Left sidebar - responsive offcanvas (offcanvas on mobile, visible sidebar on md+) -->
+      <nav id="docs-sidebar-menu" class="col-md-3 col-lg-3 col-xl-3 col-xxl-2 offcanvas-md offcanvas-start sticky-md-top menu-sidebar align-self-start order-1 order-md-0" tabindex="-1" aria-labelledby="docs-sidebar-menu-label" aria-expanded="true">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="docs-sidebar-menu-label">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#docs-sidebar-menu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ol id='menu-id-controls-0' class='menu menu-level0 show '>
+            <li id='menu-item-controls-1' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/controls/' class='menu-link  '>Controls and Facades</a></span>  </li>
+            <li id='menu-item-controls-2' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/controls/nativewebview/' class='menu-link  '>NativeWebView</a></span>  </li>
+            <li id='menu-item-controls-3' class='menu-item  active'>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/controls/nativewebdialog/' class='menu-link  '>NativeWebDialog</a></span>  </li>
+            <li id='menu-item-controls-4' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/controls/webauthenticationbroker/' class='menu-link  '>WebAuthenticationBroker</a></span>  </li>
+          </ol>
+
+        </div>
+      </nav>
+      <!-- Right sidebar (TOC) - collapsible on mobile, visible sidebar on xxl+ -->
+      <aside id="docs-sidebar-toc" class="col-12 col-xxl-2 sticky-xxl-top menu-sidebar align-self-start order-0 order-xxl-2 collapse d-xxl-block" aria-expanded="true">
+        <h3 class="toc-title">On this page</h3>
+        <nav class="js-toc"></nav>
+      </aside>
+      <!-- Main content column -->
+      <div class="col-12 col-md-9 col-lg-9 col-xl-9 col-xxl-8 order-2 order-md-1 js-toc-content">
+        <ol class='breadcrumb'>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/' class='breadcrumb-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/' class='breadcrumb-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/controls/' class='breadcrumb-link  '>Controls and Facades</a>  </li>
+          <li class='breadcrumb-item  active'>
+            NativeWebDialog  </li>
+        </ol>
+
+        <p id="lunet-results"></p>
+        <!-- Toggle buttons visible only on small screens -->
+        <div class="d-md-none mb-3">
+          <button
+            class="btn btn-outline-secondary btn-sm me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#docs-sidebar-menu"
+            aria-controls="docs-sidebar-menu"
+            aria-label="Toggle docs menu">
+            Menu
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm d-xxl-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#docs-sidebar-toc"
+            aria-controls="docs-sidebar-toc"
+            aria-expanded="false"
+            aria-label="Toggle Table Of Contents">
+            On this page
+          </button>
+        </div>
+<!-- lunet:summarize -->
+<h1 id="nativewebdialog">NativeWebDialog</h1>
+<p><code>NativeWebDialog</code> is the desktop dialog or window facade for browser workflows that do not belong inside the main Avalonia visual tree.</p>
+<h2 id="availability">Availability</h2>
+<ul>
+<li>Windows: supported.</li>
+<li>macOS: supported.</li>
+<li>Linux: supported.</li>
+<li>iOS, Android, Browser: unsupported by design in the current implementation.</li>
+</ul>
+<h2 id="main-properties">Main Properties</h2>
+<table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsVisible</code>, <code>CurrentUrl</code></td>
+<td>Dialog visibility and current URL.</td>
+</tr>
+<tr>
+<td><code>CanGoBack</code>, <code>CanGoForward</code></td>
+<td>Navigation history state.</td>
+</tr>
+<tr>
+<td><code>IsDevToolsEnabled</code>, <code>IsContextMenuEnabled</code>, <code>IsStatusBarEnabled</code>, <code>IsZoomControlEnabled</code></td>
+<td>Desktop browser UI toggles where supported.</td>
+</tr>
+<tr>
+<td><code>ZoomFactor</code>, <code>HeaderString</code>, <code>UserAgentString</code></td>
+<td>Runtime dialog browser configuration.</td>
+</tr>
+<tr>
+<td><code>LifecycleState</code></td>
+<td>Backend controller state.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="main-methods">Main Methods</h2>
+<ul>
+<li><code>Show</code>, <code>Close</code>, <code>Move</code>, <code>Resize</code></li>
+<li><code>Navigate</code>, <code>Reload</code>, <code>Stop</code>, <code>GoBack</code>, <code>GoForward</code></li>
+<li><code>ExecuteScriptAsync</code></li>
+<li><code>PostWebMessageAsJsonAsync</code>, <code>PostWebMessageAsStringAsync</code></li>
+<li><code>OpenDevToolsWindow</code></li>
+<li><code>PrintAsync</code>, <code>ShowPrintUiAsync</code></li>
+<li><code>SetZoomFactor</code>, <code>SetUserAgent</code>, <code>SetHeader</code></li>
+<li><code>TryGetPlatformHandle</code>, <code>TryGetDialogHandle</code>, <code>TryGetHostWindowHandle</code></li>
+</ul>
+<h2 id="main-events">Main Events</h2>
+<ul>
+<li>Visibility: <code>Shown</code>, <code>Closed</code></li>
+<li>Navigation: <code>NavigationStarted</code>, <code>NavigationCompleted</code></li>
+<li>Messaging and interception: <code>WebMessageReceived</code>, <code>NewWindowRequested</code>, <code>WebResourceRequested</code>, <code>ContextMenuRequested</code></li>
+</ul>
+<h2 id="typical-usage-pattern">Typical Usage Pattern</h2>
+<pre><code class="language-csharp">using NativeWebView.Dialog;
+using NativeWebView.Core;
+
+NativeWebViewRuntime.EnsureCurrentPlatformRegistered();
+
+using var dialog = new NativeWebDialog();
+dialog.Show(new NativeWebDialogShowOptions
+{
+    Title = &quot;NativeWebView Sample Dialog&quot;,
+    Width = 900,
+    Height = 640
+});
+dialog.Navigate(&quot;https://example.com/dialog&quot;);
+</code></pre>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Dialog backends remain capability-driven just like the embedded control.</li>
+<li>Print UI and DevTools depend on the platform backend.</li>
+<li>Unsupported mobile/browser targets return unsupported backend contracts instead of silently no-op behavior.</li>
+</ul>
+
+      </div>
+  </div>
+</div>
+
+        </section>
+        <footer>
+          <hr>
+          <p>Copyright &copy; 2026, Wieslaw Soltes aka <a href="https://github.com/wieslawsoltes">wieslawsoltes</a> - Content licensed under the Creative Commons <a href="http://creativecommons.org/licenses/by/2.5/">CC BY 2.5</a> | Site generated by <a href="https://github.com/lunet-io/lunet">lunet</a> hosted on <a href="https://pages.github.com/">GitHub Pages</a></p>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

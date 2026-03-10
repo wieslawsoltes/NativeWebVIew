@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html data-lunet-theme-mode="system" data-lunet-theme-storage-key="lunet-theme" data-lunet-css-prefix="lunet" lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="lunet 1.0.10.0">
+    <script>(function(){const root=document.documentElement;const key=root.getAttribute("data-lunet-theme-storage-key")||"lunet-theme";const fallback=root.getAttribute("data-lunet-theme-mode")||"system";let stored=null;try{stored=localStorage.getItem(key);}catch(_){stored=null;}const mode=(stored==="light"||stored==="dark"||stored==="system")?stored:fallback;const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;const resolved=mode==="system"?(prefersDark?"dark":"light"):mode;root.setAttribute("data-lunet-theme-mode",mode);root.setAttribute("data-bs-theme",resolved);}());</script>
+    <link rel='icon' href='/NativeWebVIew/favicon.ico' sizes='32x32'>
+    <title>Platform Diagnostics Report | NativeWebView</title>
+    <link rel="stylesheet" href="/NativeWebVIew/css/lite.css">
+    <script src="/NativeWebVIew/js/lite-defer.js" defer></script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wieslawsoltes">
+<meta name="twitter:title" content="Platform Diagnostics Report | NativeWebView">
+<meta name="twitter:description" content="Platform Diagnostics Report Use the diagnostics reporter to generate a JSON summary for one or more platforms and optionally fail when blocking issues are detected. CLI Sample Project: samples/NativeWebView.Sample.Diagnostics Example: dotnet run --project samples/NativeWebView.Sample.Diagnostics/NativeWebView.Sample.Diagnostics.csproj -- \ --platform all \ --output artifacts/diagnostics/platform-diagnostics-report.json \ --require-ready Options --platform &lt;value>: all or a comma-separated subset of windows,macos,linux,ios,android,browser...">
+<meta name="twitter:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta name="twitter:image:alt" content="Platform Diagnostics Report | NativeWebView">
+<meta property="og:title" content="Platform Diagnostics Report | NativeWebView">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://wieslawsoltes.github.io/NativeWebVIew">
+<meta property="og:description" content="Platform Diagnostics Report Use the diagnostics reporter to generate a JSON summary for one or more platforms and optionally fail when blocking issues are detected. CLI Sample Project: samples/NativeWebView.Sample.Diagnostics Example: dotnet run --project samples/NativeWebView.Sample.Diagnostics/NativeWebView.Sample.Diagnostics.csproj -- \ --platform all \ --output artifacts/diagnostics/platform-diagnostics-report.json \ --require-ready Options --platform &lt;value>: all or a comma-separated subset of windows,macos,linux,ios,android,browser...">
+<meta property="og:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta property="og:image:alt" content="Platform Diagnostics Report | NativeWebView">
+  </head>
+  <body>
+
+    <div id="lunet" class="container">
+      <nav class="navbar navbar-expand-md sticky-top">
+        <a class="navbar-brand" href="/NativeWebVIew/">
+          <img class="lunet-logo" src="/NativeWebVIew/images/logo.svg" alt="NativeWebView" width="96" height="96">
+          <span class="visually-hidden">Home</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarSupportedContent" class="collapse navbar-collapse justify-content-between">
+<ol id='nav-id-home-0' class='navbar-nav nav-level0 show '>
+  <li id='nav-item-home-1' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/' class='nav-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a></span>  </li>
+  <li id='nav-item-home-2' class='nav-item  active'>
+    <span class='nav-item-row'><a href='/NativeWebVIew/articles/' class='nav-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a></span>  </li>
+  <li id='nav-item-home-3' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/api/' class='nav-link  '><i class='bi bi-braces' aria-hidden='true'></i> API</a></span>  </li>
+</ol>
+          <ol class="navbar-nav flex-grow-1" style="padding-right: 0.5rem;">
+            <li class="nav-item w-100">
+                <div class="lunet-search dropdown w-100">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="search-input" type="search" class="form-control" placeholder="Search... (Alt+s)" aria-label="Search" aria-controls="search-results" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-search-empty-message="Enter words to search..." data-search-no-results-message="No results found.">
+                    <ul id="search-results" class="dropdown-menu w-100 p-0" style="max-height: 50vh;" role="listbox" aria-labelledby="search-input"></ul>
+                  </div>
+                </div>
+            </li>
+          </ol>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0 navbar-right">
+            <div class="dropdown">
+              <button
+                id="theme-mode-toggle"
+                class="btn btn-outline-secondary btn-sm lunet-theme-toggle dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Theme">
+                <i class="bi bi-circle-half" data-lunet-theme-toggle-icon aria-hidden="true"></i>
+                <span
+                  data-lunet-theme-toggle-label
+                  data-theme-system-label="System"
+                  data-theme-light-label="Light"
+                  data-theme-dark-label="Dark">Theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-mode-toggle">
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="system"><i class="bi bi-circle-half me-2"></i>System</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="light"><i class="bi bi-sun-fill me-2"></i>Light</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="dark"><i class="bi bi-moon-stars-fill me-2"></i>Dark</button></li>
+              </ul>
+            </div>
+<ol id='nav-id-home2-0' class='navbar-nav nav-level0 show flex-shrink-0'>
+  <li id='nav-item-home2-1' class='nav-item '>
+    <span class='nav-item-row'><a href='https://github.com/wieslawsoltes/NativeWebVIew' class='nav-link  btn btn-info'><i class="bi bi-github"></i> GitHub</a></span>  </li>
+</ol>
+          </div>
+        </div>
+      </nav>
+      <div class="lunet lunet-articles">
+        <section data-prismjs-copy="" data-prismjs-copy-success="" data-prismjs-copy-timeout="1200" data-copy-tooltip="Copy to Clipboard." data-copy-tooltip-success="Copied!" data-copy-tooltip-error="Failed to copy!">
+
+<div class="container-xxl">
+  <div class="row">
+      <!-- Left sidebar - responsive offcanvas (offcanvas on mobile, visible sidebar on md+) -->
+      <nav id="docs-sidebar-menu" class="col-md-3 col-lg-3 col-xl-3 col-xxl-2 offcanvas-md offcanvas-start sticky-md-top menu-sidebar align-self-start order-1 order-md-0" tabindex="-1" aria-labelledby="docs-sidebar-menu-label" aria-expanded="true">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="docs-sidebar-menu-label">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#docs-sidebar-menu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ol id='menu-id-diagnostics-0' class='menu menu-level0 show '>
+            <li id='menu-item-diagnostics-1' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/' class='menu-link  '>Diagnostics and Operations</a></span>  </li>
+            <li id='menu-item-diagnostics-2' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/platform-prerequisites/' class='menu-link  '>Platform Prerequisites</a></span>  </li>
+            <li id='menu-item-diagnostics-3' class='menu-item  active'>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/platform-diagnostics-report/' class='menu-link  '>Platform Diagnostics Report</a></span>  </li>
+            <li id='menu-item-diagnostics-4' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/ci-and-release/' class='menu-link  '>CI and Release</a></span>  </li>
+          </ol>
+
+        </div>
+      </nav>
+      <!-- Right sidebar (TOC) - collapsible on mobile, visible sidebar on xxl+ -->
+      <aside id="docs-sidebar-toc" class="col-12 col-xxl-2 sticky-xxl-top menu-sidebar align-self-start order-0 order-xxl-2 collapse d-xxl-block" aria-expanded="true">
+        <h3 class="toc-title">On this page</h3>
+        <nav class="js-toc"></nav>
+      </aside>
+      <!-- Main content column -->
+      <div class="col-12 col-md-9 col-lg-9 col-xl-9 col-xxl-8 order-2 order-md-1 js-toc-content">
+        <ol class='breadcrumb'>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/' class='breadcrumb-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/' class='breadcrumb-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/diagnostics/' class='breadcrumb-link  '>Diagnostics and Operations</a>  </li>
+          <li class='breadcrumb-item  active'>
+            Platform Diagnostics Report  </li>
+        </ol>
+
+        <p id="lunet-results"></p>
+        <!-- Toggle buttons visible only on small screens -->
+        <div class="d-md-none mb-3">
+          <button
+            class="btn btn-outline-secondary btn-sm me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#docs-sidebar-menu"
+            aria-controls="docs-sidebar-menu"
+            aria-label="Toggle docs menu">
+            Menu
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm d-xxl-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#docs-sidebar-toc"
+            aria-controls="docs-sidebar-toc"
+            aria-expanded="false"
+            aria-label="Toggle Table Of Contents">
+            On this page
+          </button>
+        </div>
+<!-- lunet:summarize -->
+<h1 id="platform-diagnostics-report">Platform Diagnostics Report</h1>
+<p>Use the diagnostics reporter to generate a JSON summary for one or more platforms and optionally fail when blocking issues are detected.</p>
+<h2 id="cli-sample">CLI Sample</h2>
+<p>Project:</p>
+<ul>
+<li><code>samples/NativeWebView.Sample.Diagnostics</code></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-bash">dotnet run --project samples/NativeWebView.Sample.Diagnostics/NativeWebView.Sample.Diagnostics.csproj -- \
+  --platform all \
+  --output artifacts/diagnostics/platform-diagnostics-report.json \
+  --require-ready
+</code></pre>
+<h2 id="options">Options</h2>
+<ul>
+<li><code>--platform &lt;value&gt;</code>: <code>all</code> or a comma-separated subset of <code>windows,macos,linux,ios,android,browser</code>.</li>
+<li><code>--output &lt;path&gt;</code>: output JSON file path.</li>
+<li><code>--markdown-output &lt;path&gt;</code>: optional markdown summary output path.</li>
+<li><code>--blocking-baseline &lt;path&gt;</code>: optional baseline file (<code>&lt;Platform&gt;|&lt;IssueCode&gt;</code>).</li>
+<li><code>--blocking-baseline-output &lt;path&gt;</code>: optional path to write current baseline entries.</li>
+<li><code>--comparison-markdown-output &lt;path&gt;</code>: optional markdown output for baseline comparison.</li>
+<li><code>--comparison-json-output &lt;path&gt;</code>: optional JSON output for baseline comparison.</li>
+<li><code>--comparison-evaluation-markdown-output &lt;path&gt;</code>: optional markdown output for gate evaluation.</li>
+<li><code>--require-ready</code>: enable readiness gate.</li>
+<li><code>--warnings-as-errors</code>: treat warnings as blocking.</li>
+<li><code>--allow-regression</code>: do not fail when new blocking issues are found.</li>
+<li><code>--require-baseline-sync</code>: fail when the baseline contains resolved or stale entries.</li>
+</ul>
+<h2 id="exit-code-contract">Exit Code Contract</h2>
+<ul>
+<li><code>0</code>: no enabled gates failed.</li>
+<li><code>10</code>: readiness gate failed.</li>
+<li><code>11</code>: regression gate failed.</li>
+<li><code>12</code>: baseline-sync gate failed.</li>
+<li><code>13</code>: multiple enabled gates failed in one run.</li>
+</ul>
+<h2 id="wrapper-script">Wrapper Script</h2>
+<p>Use the repository wrapper script for CI and local consistency:</p>
+<pre><code class="language-bash">./scripts/run-platform-diagnostics-report.sh \
+  --configuration Release \
+  --no-build \
+  --platform all \
+  --output artifacts/diagnostics/platform-diagnostics-report.json \
+  --markdown-output artifacts/diagnostics/platform-diagnostics-report.md \
+  --blocking-baseline ci/baselines/blocking-issues-baseline.txt \
+  --blocking-baseline-output artifacts/diagnostics/current-blocking-baseline.txt \
+  --comparison-markdown-output artifacts/diagnostics/blocking-regression.md \
+  --comparison-json-output artifacts/diagnostics/blocking-regression.json \
+  --comparison-evaluation-markdown-output artifacts/diagnostics/gate-evaluation.md \
+  --require-baseline-sync \
+  --allow-not-ready
+</code></pre>
+<p>Additional script behavior:</p>
+<ul>
+<li><code>--allow-not-ready</code>: generate reports without failing when blocking issues are present.</li>
+<li>By default, <code>run-platform-diagnostics-report.sh</code> enforces readiness.</li>
+<li>By default, baseline comparison failures fail the command unless <code>--allow-regression</code> is set.</li>
+<li><code>--require-baseline-sync</code> enforces baseline hygiene by failing when stale resolved entries remain in the baseline.</li>
+</ul>
+<h2 id="output-artifacts">Output Artifacts</h2>
+<p>The report pipeline produces:</p>
+<ul>
+<li>JSON and markdown summary reports,</li>
+<li>blocking regression comparison reports,</li>
+<li>gate evaluation markdown and JSON,</li>
+<li>exit-code contract conformance summaries,</li>
+<li>deterministic evaluation fingerprints for baseline drift detection.</li>
+</ul>
+<h2 id="report-shape">Report Shape</h2>
+<p>Top-level fields:</p>
+<ul>
+<li><code>generatedAtUtc</code></li>
+<li><code>warningsAsErrors</code></li>
+<li><code>isReady</code></li>
+<li><code>issueCount</code></li>
+<li><code>warningCount</code></li>
+<li><code>errorCount</code></li>
+<li><code>blockingIssueCount</code></li>
+<li><code>platforms</code></li>
+</ul>
+<p>Each platform entry includes:</p>
+<ul>
+<li><code>platform</code></li>
+<li><code>providerName</code></li>
+<li><code>providerRegistered</code></li>
+<li><code>isReady</code></li>
+<li><code>issueCount</code></li>
+<li><code>warningCount</code></li>
+<li><code>errorCount</code></li>
+<li><code>blockingIssueCount</code></li>
+<li><code>issues[]</code> with <code>code</code>, <code>severity</code>, <code>message</code>, and <code>recommendation</code></li>
+</ul>
+<p>Markdown output includes:</p>
+<ul>
+<li>overall readiness and counts,</li>
+<li>platform summary table,</li>
+<li>per-platform issue sections.</li>
+</ul>
+<p>Blocking regression markdown output includes:</p>
+<ul>
+<li>baseline and current blocking issue counts,</li>
+<li>new blocking issues,</li>
+<li>resolved blocking issues,</li>
+<li>regression and stale-baseline flags.</li>
+</ul>
+<p>Blocking regression JSON output includes:</p>
+<ul>
+<li>policy flags (<code>requireReady</code>, <code>failOnRegression</code>, <code>requireBaselineSync</code>),</li>
+<li>gate outcomes (<code>wouldFailRequireReady</code>, <code>wouldFailRegressionGate</code>, <code>wouldFailBaselineSyncGate</code>),</li>
+<li>final <code>effectiveExitCode</code>,</li>
+<li>deterministic <code>fingerprint</code> and <code>fingerprintVersion</code>,</li>
+<li>structured <code>gateFailures[]</code>,</li>
+<li>embedded comparison details when baseline comparison is enabled.</li>
+</ul>
+<p>Gate evaluation markdown output includes:</p>
+<ul>
+<li>policy flags and readiness/comparison state,</li>
+<li>effective exit code and primary failure classification,</li>
+<li>deterministic evaluation fingerprint,</li>
+<li>optional baseline comparison snapshot counts,</li>
+<li>failing gate descriptions and recommendations.</li>
+</ul>
+<h2 id="baseline-refresh-helper">Baseline Refresh Helper</h2>
+<p>Use the helper script to regenerate the baseline from current diagnostics:</p>
+<pre><code class="language-bash">./scripts/update-blocking-baseline.sh \
+  --configuration Release \
+  --platform all \
+  --output ci/baselines/blocking-issues-baseline.txt
+</code></pre>
+<p>Optional strict regeneration:</p>
+<pre><code class="language-bash">./scripts/update-blocking-baseline.sh --warnings-as-errors
+</code></pre>
+<h2 id="exit-code-contract-validation-script">Exit Code Contract Validation Script</h2>
+<p>Use the dedicated validation script to exercise all gate outcomes (<code>0</code>, <code>10</code>, <code>11</code>, <code>12</code>, <code>13</code>):</p>
+<pre><code class="language-bash">./scripts/validate-diagnostics-exit-code-contract.sh \
+  --configuration Release \
+  --no-build \
+  --output-dir artifacts/diagnostics/exit-code-contract \
+  --baseline ci/baselines/blocking-issues-baseline.txt
+</code></pre>
+<p>Optional fingerprint baseline gate:</p>
+<pre><code class="language-bash">./scripts/validate-diagnostics-exit-code-contract.sh \
+  --configuration Release \
+  --no-build \
+  --output-dir artifacts/diagnostics/exit-code-contract \
+  --baseline ci/baselines/blocking-issues-baseline.txt \
+  --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
+</code></pre>
+<p>Outputs include:</p>
+<ul>
+<li><code>exit-code-contract-summary.md</code></li>
+<li><code>exit-code-contract-summary.csv</code></li>
+<li><code>exit-code-contract-summary.json</code></li>
+<li>scenario logs and generated evaluation or report JSON files</li>
+<li>per-scenario gate evaluation markdown files</li>
+<li><code>fingerprint-current.txt</code></li>
+<li><code>fingerprint-baseline-comparison.md</code> and <code>fingerprint-baseline-comparison.json</code> when fingerprint gating is enabled</li>
+</ul>
+<p>Refresh the fingerprint baseline when contract changes are intentional:</p>
+<pre><code class="language-bash">./scripts/update-diagnostics-fingerprint-baseline.sh \
+  --configuration Release \
+  --output ci/baselines/diagnostics-fingerprint-baseline.txt
+</code></pre>
+<h2 id="ci-and-release-usage">CI and Release Usage</h2>
+<ul>
+<li>CI publishes diagnostics, regression, gate evaluation, and fingerprint comparison markdown into the workflow summary.</li>
+<li>CI and release compare blocking issues against <code>ci/baselines/blocking-issues-baseline.txt</code> and enforce baseline-sync hygiene.</li>
+<li>CI and release publish machine-readable regression evaluation JSON artifacts for policy and gate auditing.</li>
+<li>Release appends diagnostics, regression, gate-evaluation, and exit-code conformance summaries to release notes and attaches the raw artifacts to the GitHub release.</li>
+</ul>
+
+      </div>
+  </div>
+</div>
+
+        </section>
+        <footer>
+          <hr>
+          <p>Copyright &copy; 2026, Wieslaw Soltes aka <a href="https://github.com/wieslawsoltes">wieslawsoltes</a> - Content licensed under the Creative Commons <a href="http://creativecommons.org/licenses/by/2.5/">CC BY 2.5</a> | Site generated by <a href="https://github.com/lunet-io/lunet">lunet</a> hosted on <a href="https://pages.github.com/">GitHub Pages</a></p>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html data-lunet-theme-mode="system" data-lunet-theme-storage-key="lunet-theme" data-lunet-css-prefix="lunet" lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="lunet 1.0.10.0">
+    <script>(function(){const root=document.documentElement;const key=root.getAttribute("data-lunet-theme-storage-key")||"lunet-theme";const fallback=root.getAttribute("data-lunet-theme-mode")||"system";let stored=null;try{stored=localStorage.getItem(key);}catch(_){stored=null;}const mode=(stored==="light"||stored==="dark"||stored==="system")?stored:fallback;const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;const resolved=mode==="system"?(prefersDark?"dark":"light"):mode;root.setAttribute("data-lunet-theme-mode",mode);root.setAttribute("data-bs-theme",resolved);}());</script>
+    <link rel='icon' href='/NativeWebVIew/favicon.ico' sizes='32x32'>
+    <title>CI and Release | NativeWebView</title>
+    <link rel="stylesheet" href="/NativeWebVIew/css/lite.css">
+    <script src="/NativeWebVIew/js/lite-defer.js" defer></script>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wieslawsoltes">
+<meta name="twitter:title" content="CI and Release | NativeWebView">
+<meta name="twitter:description" content="CI and Release Pull Request CI Workflow: .github/workflows/ci.yml Runs on: ubuntu-latest macos-latest windows-latest Stages: Quality gate with dotnet format --verify-no-changes --severity warn. Changelog fragment validation. Docs build with Lunet via ./check-docs.sh. Restore, build, and test on Windows, macOS, and Linux. Diagnostics exit-code contract validation. Desktop and mobile/browser sample smoke runs. Platform diagnostics JSON and markdown generation. Baseline regression and baseline-sync enforcement....">
+<meta name="twitter:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta name="twitter:image:alt" content="CI and Release | NativeWebView">
+<meta property="og:title" content="CI and Release | NativeWebView">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://wieslawsoltes.github.io/NativeWebVIew">
+<meta property="og:description" content="CI and Release Pull Request CI Workflow: .github/workflows/ci.yml Runs on: ubuntu-latest macos-latest windows-latest Stages: Quality gate with dotnet format --verify-no-changes --severity warn. Changelog fragment validation. Docs build with Lunet via ./check-docs.sh. Restore, build, and test on Windows, macOS, and Linux. Diagnostics exit-code contract validation. Desktop and mobile/browser sample smoke runs. Platform diagnostics JSON and markdown generation. Baseline regression and baseline-sync enforcement....">
+<meta property="og:image" content="https://wieslawsoltes.github.io/NativeWebVIew/images/logo.svg">
+<meta property="og:image:alt" content="CI and Release | NativeWebView">
+  </head>
+  <body>
+
+    <div id="lunet" class="container">
+      <nav class="navbar navbar-expand-md sticky-top">
+        <a class="navbar-brand" href="/NativeWebVIew/">
+          <img class="lunet-logo" src="/NativeWebVIew/images/logo.svg" alt="NativeWebView" width="96" height="96">
+          <span class="visually-hidden">Home</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarSupportedContent" class="collapse navbar-collapse justify-content-between">
+<ol id='nav-id-home-0' class='navbar-nav nav-level0 show '>
+  <li id='nav-item-home-1' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/' class='nav-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a></span>  </li>
+  <li id='nav-item-home-2' class='nav-item  active'>
+    <span class='nav-item-row'><a href='/NativeWebVIew/articles/' class='nav-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a></span>  </li>
+  <li id='nav-item-home-3' class='nav-item '>
+    <span class='nav-item-row'><a href='/NativeWebVIew/api/' class='nav-link  '><i class='bi bi-braces' aria-hidden='true'></i> API</a></span>  </li>
+</ol>
+          <ol class="navbar-nav flex-grow-1" style="padding-right: 0.5rem;">
+            <li class="nav-item w-100">
+                <div class="lunet-search dropdown w-100">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input id="search-input" type="search" class="form-control" placeholder="Search... (Alt+s)" aria-label="Search" aria-controls="search-results" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-search-empty-message="Enter words to search..." data-search-no-results-message="No results found.">
+                    <ul id="search-results" class="dropdown-menu w-100 p-0" style="max-height: 50vh;" role="listbox" aria-labelledby="search-input"></ul>
+                  </div>
+                </div>
+            </li>
+          </ol>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0 navbar-right">
+            <div class="dropdown">
+              <button
+                id="theme-mode-toggle"
+                class="btn btn-outline-secondary btn-sm lunet-theme-toggle dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                aria-label="Theme">
+                <i class="bi bi-circle-half" data-lunet-theme-toggle-icon aria-hidden="true"></i>
+                <span
+                  data-lunet-theme-toggle-label
+                  data-theme-system-label="System"
+                  data-theme-light-label="Light"
+                  data-theme-dark-label="Dark">Theme</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-mode-toggle">
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="system"><i class="bi bi-circle-half me-2"></i>System</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="light"><i class="bi bi-sun-fill me-2"></i>Light</button></li>
+                <li><button class="dropdown-item" type="button" data-lunet-theme-choice="dark"><i class="bi bi-moon-stars-fill me-2"></i>Dark</button></li>
+              </ul>
+            </div>
+<ol id='nav-id-home2-0' class='navbar-nav nav-level0 show flex-shrink-0'>
+  <li id='nav-item-home2-1' class='nav-item '>
+    <span class='nav-item-row'><a href='https://github.com/wieslawsoltes/NativeWebVIew' class='nav-link  btn btn-info'><i class="bi bi-github"></i> GitHub</a></span>  </li>
+</ol>
+          </div>
+        </div>
+      </nav>
+      <div class="lunet lunet-articles">
+        <section data-prismjs-copy="" data-prismjs-copy-success="" data-prismjs-copy-timeout="1200" data-copy-tooltip="Copy to Clipboard." data-copy-tooltip-success="Copied!" data-copy-tooltip-error="Failed to copy!">
+
+<div class="container-xxl">
+  <div class="row">
+      <!-- Left sidebar - responsive offcanvas (offcanvas on mobile, visible sidebar on md+) -->
+      <nav id="docs-sidebar-menu" class="col-md-3 col-lg-3 col-xl-3 col-xxl-2 offcanvas-md offcanvas-start sticky-md-top menu-sidebar align-self-start order-1 order-md-0" tabindex="-1" aria-labelledby="docs-sidebar-menu-label" aria-expanded="true">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="docs-sidebar-menu-label">Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#docs-sidebar-menu" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ol id='menu-id-diagnostics-0' class='menu menu-level0 show '>
+            <li id='menu-item-diagnostics-1' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/' class='menu-link  '>Diagnostics and Operations</a></span>  </li>
+            <li id='menu-item-diagnostics-2' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/platform-prerequisites/' class='menu-link  '>Platform Prerequisites</a></span>  </li>
+            <li id='menu-item-diagnostics-3' class='menu-item '>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/platform-diagnostics-report/' class='menu-link  '>Platform Diagnostics Report</a></span>  </li>
+            <li id='menu-item-diagnostics-4' class='menu-item  active'>
+              <span class='menu-item-row'><a href='/NativeWebVIew/articles/diagnostics/ci-and-release/' class='menu-link  '>CI and Release</a></span>  </li>
+          </ol>
+
+        </div>
+      </nav>
+      <!-- Right sidebar (TOC) - collapsible on mobile, visible sidebar on xxl+ -->
+      <aside id="docs-sidebar-toc" class="col-12 col-xxl-2 sticky-xxl-top menu-sidebar align-self-start order-0 order-xxl-2 collapse d-xxl-block" aria-expanded="true">
+        <h3 class="toc-title">On this page</h3>
+        <nav class="js-toc"></nav>
+      </aside>
+      <!-- Main content column -->
+      <div class="col-12 col-md-9 col-lg-9 col-xl-9 col-xxl-8 order-2 order-md-1 js-toc-content">
+        <ol class='breadcrumb'>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/' class='breadcrumb-link  '><i class='bi bi-house-door' aria-hidden='true'></i> Home</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/' class='breadcrumb-link  '><i class='bi bi-book' aria-hidden='true'></i> Docs</a>  </li>
+          <li class='breadcrumb-item '>
+            <a href='/NativeWebVIew/articles/diagnostics/' class='breadcrumb-link  '>Diagnostics and Operations</a>  </li>
+          <li class='breadcrumb-item  active'>
+            CI and Release  </li>
+        </ol>
+
+        <p id="lunet-results"></p>
+        <!-- Toggle buttons visible only on small screens -->
+        <div class="d-md-none mb-3">
+          <button
+            class="btn btn-outline-secondary btn-sm me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#docs-sidebar-menu"
+            aria-controls="docs-sidebar-menu"
+            aria-label="Toggle docs menu">
+            Menu
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm d-xxl-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#docs-sidebar-toc"
+            aria-controls="docs-sidebar-toc"
+            aria-expanded="false"
+            aria-label="Toggle Table Of Contents">
+            On this page
+          </button>
+        </div>
+<!-- lunet:summarize -->
+<h1 id="ci-and-release">CI and Release</h1>
+<h2 id="pull-request-ci">Pull Request CI</h2>
+<p>Workflow: <code>.github/workflows/ci.yml</code></p>
+<p>Runs on:</p>
+<ul>
+<li><code>ubuntu-latest</code></li>
+<li><code>macos-latest</code></li>
+<li><code>windows-latest</code></li>
+</ul>
+<p>Stages:</p>
+<ol>
+<li>Quality gate with <code>dotnet format --verify-no-changes --severity warn</code>.</li>
+<li>Changelog fragment validation.</li>
+<li>Docs build with Lunet via <code>./check-docs.sh</code>.</li>
+<li>Restore, build, and test on Windows, macOS, and Linux.</li>
+<li>Diagnostics exit-code contract validation.</li>
+<li>Desktop and mobile/browser sample smoke runs.</li>
+<li>Platform diagnostics JSON and markdown generation.</li>
+<li>Baseline regression and baseline-sync enforcement.</li>
+<li>Diagnostics, regression, gate-evaluation, and fingerprint summaries appended to the workflow summary.</li>
+<li>Machine-readable diagnostics artifacts published for release triage and policy auditing.</li>
+<li>NuGet packaging and package validation.</li>
+<li>Artifact publication for tests, docs, diagnostics, and packages.</li>
+</ol>
+<p>Additional details:</p>
+<ul>
+<li>Smoke scripts enable <code>NATIVEWEBVIEW_DIAGNOSTICS_REQUIRE_READY=1</code> to fail on blocking prerequisite issues.</li>
+<li>Exit-code contract validation enforces fingerprint baselines from <code>ci/baselines/diagnostics-fingerprint-baseline.txt</code>.</li>
+<li>Package validation checks <code>.nupkg</code>, <code>.snupkg</code>, nuspec metadata, README/license packing, and expected inter-package dependencies.</li>
+</ul>
+<h2 id="docs-publishing">Docs Publishing</h2>
+<p>Workflow: <code>.github/workflows/docs.yml</code></p>
+<p>Stages:</p>
+<ol>
+<li>Restore local dotnet tools.</li>
+<li>Build the Lunet site via <code>./build-docs.sh</code>.</li>
+<li>Publish <code>site/.lunet/build/www</code> to GitHub Pages.</li>
+</ol>
+<p>The workflow is push-driven and uses the same Lunet shell script locally and in CI so authored docs and API generation stay on one path.</p>
+<h2 id="tag-release">Tag Release</h2>
+<p>Workflow: <code>.github/workflows/release.yml</code></p>
+<p>Trigger:</p>
+<ul>
+<li>Push tag <code>v*</code> (for example <code>v0.1.0</code>)</li>
+</ul>
+<p>Stages:</p>
+<ol>
+<li>Resolve version from <code>v*</code> tag.</li>
+<li>Validate changelog fragments.</li>
+<li>Restore, build, and test in <code>Release</code>.</li>
+<li>Run diagnostics exit-code contract validation and smoke checks.</li>
+<li>Generate diagnostics JSON and markdown reports.</li>
+<li>Compare blocking diagnostics against the checked-in baseline and enforce baseline sync.</li>
+<li>Pack all NuGet packages with symbol packages.</li>
+<li>Validate package archives.</li>
+<li>Build release notes and append diagnostics, regression, gate-evaluation, exit-code conformance, and package validation summaries.</li>
+<li>Upload package, release-note, docs, and diagnostics artifacts.</li>
+<li>Push packages to nuget.org when <code>NUGET_API_KEY</code> is configured.</li>
+<li>Create the GitHub release.</li>
+</ol>
+<h2 id="extended-validation-workflow">Extended Validation Workflow</h2>
+<p>Workflow: <code>.github/workflows/extended-validation.yml</code></p>
+<p>Trigger:</p>
+<ul>
+<li>Manual (<code>workflow_dispatch</code>)</li>
+<li>Weekly schedule (<code>cron</code>)</li>
+</ul>
+<p>Stages:</p>
+<ol>
+<li>Browser docs validation via <code>scripts/run-browser-playwright-smoke.sh</code>.</li>
+<li>iOS mobile/browser contract smoke with simulator boot on <code>macos-latest</code>.</li>
+<li>Android mobile/browser contract smoke inside an emulator on <code>ubuntu-latest</code>.</li>
+<li>Upload Playwright report, iOS simulator logs, and Android logcat artifacts.</li>
+</ol>
+<h2 id="local-docs-commands">Local Docs Commands</h2>
+<pre><code class="language-bash">./build-docs.sh
+./check-docs.sh
+./serve-docs.sh
+</code></pre>
+<p>PowerShell:</p>
+<pre><code class="language-powershell">./build-docs.ps1
+./serve-docs.ps1
+</code></pre>
+<h2 id="local-packaging-and-release-validation">Local Packaging and Release Validation</h2>
+<pre><code class="language-bash">dotnet build NativeWebView.sln -c Release
+./scripts/run-platform-diagnostics-report.sh --configuration Release --no-build --platform all --output artifacts/diagnostics/platform-diagnostics-report.json --markdown-output artifacts/diagnostics/platform-diagnostics-report.md --blocking-baseline ci/baselines/blocking-issues-baseline.txt --blocking-baseline-output artifacts/diagnostics/current-blocking-baseline.txt --comparison-markdown-output artifacts/diagnostics/blocking-regression.md --comparison-json-output artifacts/diagnostics/blocking-regression.json --comparison-evaluation-markdown-output artifacts/diagnostics/gate-evaluation.md --require-baseline-sync --allow-not-ready
+./scripts/validate-diagnostics-exit-code-contract.sh --configuration Release --no-build --output-dir artifacts/diagnostics/exit-code-contract --baseline ci/baselines/blocking-issues-baseline.txt --fingerprint-baseline ci/baselines/diagnostics-fingerprint-baseline.txt
+dotnet pack NativeWebView.sln -c Release --no-build -o artifacts/packages
+bash ./scripts/validate-nuget-packages.sh --package-dir artifacts/packages --markdown-output artifacts/packages/package-validation.md
+</code></pre>
+<p>Refresh baselines when intentional prerequisite or fingerprint changes are accepted:</p>
+<pre><code class="language-bash">./scripts/update-blocking-baseline.sh --configuration Release --platform all --output ci/baselines/blocking-issues-baseline.txt
+./scripts/update-diagnostics-fingerprint-baseline.sh --configuration Release --output ci/baselines/diagnostics-fingerprint-baseline.txt
+</code></pre>
+
+      </div>
+  </div>
+</div>
+
+        </section>
+        <footer>
+          <hr>
+          <p>Copyright &copy; 2026, Wieslaw Soltes aka <a href="https://github.com/wieslawsoltes">wieslawsoltes</a> - Content licensed under the Creative Commons <a href="http://creativecommons.org/licenses/by/2.5/">CC BY 2.5</a> | Site generated by <a href="https://github.com/lunet-io/lunet">lunet</a> hosted on <a href="https://pages.github.com/">GitHub Pages</a></p>
+        </footer>
+      </div>
+    </div>
+
+  </body>
+</html>
