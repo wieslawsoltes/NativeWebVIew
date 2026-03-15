@@ -143,6 +143,22 @@ public sealed class ProxyConfigurationSupportTests
     }
 
     [Fact]
+    public void WindowsProxyArgumentsBuilder_Merge_ReplacesExistingProxySwitches()
+    {
+        var arguments = NativeWebViewWindowsProxyArgumentsBuilder.Merge(
+            "--disable-features=Foo --proxy-server=\"http=old:80;https=old:80\" --proxy-bypass-list=\"localhost\"",
+            new NativeWebViewProxyOptions
+            {
+                Server = "http://proxy.example.com:8080",
+                BypassList = "intranet",
+            });
+
+        Assert.Equal(
+            "--disable-features=Foo --proxy-server=\"http=http://proxy.example.com:8080;https=http://proxy.example.com:8080\" --proxy-bypass-list=\"intranet\"",
+            arguments);
+    }
+
+    [Fact]
     public void WindowsProxyArgumentsBuilder_RejectsEmbeddedCredentials()
     {
         Assert.Throws<NotSupportedException>(() => NativeWebViewWindowsProxyArgumentsBuilder.Build(new NativeWebViewProxyOptions

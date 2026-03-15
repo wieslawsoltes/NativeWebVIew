@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace NativeWebView.Core;
 
 public enum NativeWebViewProxyPlatformCapability
@@ -148,6 +150,10 @@ public static class NativeWebViewLinuxProxySettingsBuilder
 
 public static class NativeWebViewWindowsProxyArgumentsBuilder
 {
+    private static readonly Regex ExistingProxySwitchPattern = new(
+        @"(?:^|\s)(--proxy-server=(?:""(?:\\.|[^""])*""|[^\s]+)|--proxy-bypass-list=(?:""(?:\\.|[^""])*""|[^\s]+)|--proxy-pac-url=(?:""(?:\\.|[^""])*""|[^\s]+)|--proxy-auto-detect\b|--no-proxy-server\b)",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     public static string? Build(NativeWebViewProxyOptions? options)
     {
         var resolved = NativeWebViewProxyConfigurationResolver.Resolve(options);
@@ -190,12 +196,13 @@ public static class NativeWebViewWindowsProxyArgumentsBuilder
                 : existingArguments;
         }
 
-        if (string.IsNullOrWhiteSpace(existingArguments))
+        var cleanedExistingArguments = StripExistingProxyArguments(existingArguments);
+        if (string.IsNullOrWhiteSpace(cleanedExistingArguments))
         {
             return proxyArguments;
         }
 
-        return $"{existingArguments.Trim()} {proxyArguments}";
+        return $"{cleanedExistingArguments} {proxyArguments}";
     }
 
     private static string CreateChromiumProxyServerValue(NativeWebViewResolvedProxyConfiguration resolved)
@@ -219,5 +226,19 @@ public static class NativeWebViewWindowsProxyArgumentsBuilder
             .Replace("\"", "\\\"", StringComparison.Ordinal);
 
         return $"\"{escaped}\"";
+    }
+
+    private static string? StripExistingProxyArguments(string? existingArguments)
+    {
+        if (string.IsNullOrWhiteSpace(existingArguments))
+        {
+            return null;
+        }
+
+        var withoutProxySwitches = ExistingProxySwitchPattern.Replace(existingArguments, " ");
+        var normalizedWhitespace = Regex.Replace(withoutProxySwitches, @"\s+", " ", RegexOptions.CultureInvariant).Trim();
+        return normalizedWhitespace.Length == 0
+            ? null
+            : normalizedWhitespace;
     }
 }

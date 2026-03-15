@@ -93,6 +93,7 @@ WebViewControl.CoreWebView2ControllerOptionsRequested += (_, e) =>
 ## Notes
 
 - `InstanceConfiguration` is copied per control instance, so multiple `NativeWebView` controls can start from the same template and then diverge safely.
+- Exact `UserDataFolder` / `CacheFolder` / `CookieDataFolder` / `SessionDataFolder` semantics are backend-specific. In the current repo, unsupported runtime backends still surface these values as contracts, and the macOS proxy runtime path uses them as part of isolated data-store identity rather than direct physical directory mapping.
 - On macOS, assign proxy settings before the control is attached or before a dialog is shown so the native `WKWebView` can be created with a dedicated data store.
 - `Proxy.AutoConfigUrl` remains contract-only in the current repo implementation; the macOS runtime path applies explicit server proxies only.
 - Events are raised once per backend initialization in the current implementation.
