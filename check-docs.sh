@@ -2,6 +2,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_NAME="NativeWebView"
+LEGACY_REPO_NAME="${REPO_NAME/View/VIew}"
+LEGACY_GITHUB_REPO_URL="https://github.com/wieslawsoltes/${LEGACY_REPO_NAME}"
+LEGACY_PAGES_URL="https://wieslawsoltes.github.io/${LEGACY_REPO_NAME}"
+LEGACY_BASEPATH_REGEX="(href|src)=\"/${LEGACY_REPO_NAME}/"
 
 search_generated_regex() {
     local pattern="$1"
@@ -76,18 +81,18 @@ if find "${DOC_ROOT}/articles" -name '*.md' -print -quit | grep -q .; then
     exit 1
 fi
 
-if search_generated_fixed 'https://github.com/wieslawsoltes/NativeWebVIew' "${DOC_ROOT}/index.html" "${DOC_ROOT}/articles" >/dev/null; then
-    echo "Generated docs still contain the old NativeWebVIew GitHub repository URL."
+if search_generated_fixed "${LEGACY_GITHUB_REPO_URL}" "${DOC_ROOT}/index.html" "${DOC_ROOT}/articles" >/dev/null; then
+    echo "Generated docs still contain the legacy GitHub repository URL."
     exit 1
 fi
 
-if search_generated_fixed 'https://wieslawsoltes.github.io/NativeWebVIew' "${DOC_ROOT}/index.html" "${DOC_ROOT}/articles" >/dev/null; then
-    echo "Generated docs still contain the old NativeWebVIew GitHub Pages URL."
+if search_generated_fixed "${LEGACY_PAGES_URL}" "${DOC_ROOT}/index.html" "${DOC_ROOT}/articles" >/dev/null; then
+    echo "Generated docs still contain the legacy GitHub Pages URL."
     exit 1
 fi
 
-if search_generated_regex '(href|src)="/NativeWebVIew/' "${DOC_ROOT}" >/dev/null; then
-    echo "Generated docs still contain the old NativeWebVIew production base path."
+if search_generated_regex "${LEGACY_BASEPATH_REGEX}" "${DOC_ROOT}" >/dev/null; then
+    echo "Generated docs still contain the legacy production base path."
     exit 1
 fi
 
@@ -113,7 +118,7 @@ if ! search_generated_fixed 'https://api-docs.avaloniaui.net/docs/Avalonia.Contr
 fi
 
 GETTING_STARTED_INDEX_PAGE="${DOC_ROOT}/articles/getting-started/index.html"
-if ! search_generated_fixed '/NativeWebView/css/lite.css' "${GETTING_STARTED_INDEX_PAGE}" >/dev/null; then
+if ! search_generated_fixed "/${REPO_NAME}/css/lite.css" "${GETTING_STARTED_INDEX_PAGE}" >/dev/null; then
     echo "Production getting-started page is missing the project-basepath-prefixed lite.css URL."
     exit 1
 fi

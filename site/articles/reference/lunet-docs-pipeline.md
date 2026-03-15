@@ -58,8 +58,8 @@ From repository root:
 - required landing, section, and reference routes exist
 - generated output contains no raw `.md` links or `/readme` routes
 - reference pages do not point at the stale `api/index.md` path
-- landing and article pages do not contain the old `NativeWebVIew` GitHub or Pages URLs
-- generated asset links do not use the old `/NativeWebVIew` production base path
+- landing and article pages do not contain legacy GitHub or Pages URLs from before the rename
+- generated asset links do not use the legacy production base path from before the rename
 - the footer uses the project MIT license instead of the template Creative Commons footer
 - the generated `NativeWebView` API page keeps its external Avalonia type links
 - production pages use the `/NativeWebView`-prefixed asset paths

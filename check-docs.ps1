@@ -2,6 +2,11 @@ $ErrorActionPreference = 'Stop'
 & (Join-Path $PSScriptRoot 'build-docs.ps1')
 
 $docRoot = Join-Path $PSScriptRoot 'site/.lunet/build/www'
+$repoName = 'NativeWebView'
+$legacyRepoName = $repoName -replace 'View$', 'VIew'
+$legacyGitHubRepoUrl = "https://github.com/wieslawsoltes/$legacyRepoName"
+$legacyPagesUrl = "https://wieslawsoltes.github.io/$legacyRepoName"
+$legacyBasepathPattern = "(href|src)=`"/$legacyRepoName/"
 
 function Find-GeneratedHtmlMatches {
     param(
@@ -116,22 +121,22 @@ if ($rawMarkdownOutputs.Count -gt 0) {
     throw "Generated docs still contain raw .md article outputs.`n$paths"
 }
 
-$oldGitHubRepoMatches = Find-GeneratedHtmlMatches -Pattern 'https://github.com/wieslawsoltes/NativeWebVIew' -Paths $narrativeHtmlFiles -Fixed
+$oldGitHubRepoMatches = Find-GeneratedHtmlMatches -Pattern $legacyGitHubRepoUrl -Paths $narrativeHtmlFiles -Fixed
 if ($oldGitHubRepoMatches) {
     $joinedOldGitHubRepoMatches = $oldGitHubRepoMatches -join "`n"
-    throw "Generated docs still contain the old NativeWebVIew GitHub repository URL.`n$joinedOldGitHubRepoMatches"
+    throw "Generated docs still contain the legacy GitHub repository URL.`n$joinedOldGitHubRepoMatches"
 }
 
-$oldPagesUrlMatches = Find-GeneratedHtmlMatches -Pattern 'https://wieslawsoltes.github.io/NativeWebVIew' -Paths $narrativeHtmlFiles -Fixed
+$oldPagesUrlMatches = Find-GeneratedHtmlMatches -Pattern $legacyPagesUrl -Paths $narrativeHtmlFiles -Fixed
 if ($oldPagesUrlMatches) {
     $joinedOldPagesUrlMatches = $oldPagesUrlMatches -join "`n"
-    throw "Generated docs still contain the old NativeWebVIew GitHub Pages URL.`n$joinedOldPagesUrlMatches"
+    throw "Generated docs still contain the legacy GitHub Pages URL.`n$joinedOldPagesUrlMatches"
 }
 
-$oldBasepathMatches = Find-GeneratedHtmlMatches -Pattern '(href|src)="/NativeWebVIew/' -Paths $htmlFiles
+$oldBasepathMatches = Find-GeneratedHtmlMatches -Pattern $legacyBasepathPattern -Paths $htmlFiles
 if ($oldBasepathMatches) {
     $joinedOldBasepathMatches = $oldBasepathMatches -join "`n"
-    throw "Generated docs still contain the old NativeWebVIew production base path.`n$joinedOldBasepathMatches"
+    throw "Generated docs still contain the legacy production base path.`n$joinedOldBasepathMatches"
 }
 
 $badFooterText = Find-GeneratedHtmlMatches -Pattern 'Creative Commons|CC BY 2.5' -Paths @(
@@ -159,7 +164,7 @@ if (-not $missingAvaloniaLink) {
 }
 
 $gettingStartedIndexPage = Join-Path $docRoot 'articles/getting-started/index.html'
-$missingBasepathCss = Find-GeneratedHtmlMatches -Pattern '/NativeWebView/css/lite.css' -Paths @($gettingStartedIndexPage) -Fixed
+$missingBasepathCss = Find-GeneratedHtmlMatches -Pattern "/$repoName/css/lite.css" -Paths @($gettingStartedIndexPage) -Fixed
 if (-not $missingBasepathCss) {
     throw 'Production getting-started page is missing the project-basepath-prefixed lite.css URL.'
 }
