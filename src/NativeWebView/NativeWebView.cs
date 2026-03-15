@@ -659,6 +659,26 @@ public class NativeWebView : NativeControlHost, IDisposable
             return _macOSHost.PlatformHandle;
         }
 
+        if (OperatingSystem.IsBrowser() &&
+            _controller.TryGetBackend<INativeWebViewManagedControlHandleProvider>(out var managedControlHandleProvider))
+        {
+            var managedControlHandle = managedControlHandleProvider.CreateManagedControlHandle();
+            if (managedControlHandle is not IPlatformHandle platformHandle)
+            {
+                throw new InvalidOperationException(
+                    $"Browser managed control handle provider returned '{managedControlHandle?.GetType().FullName ?? "<null>"}' instead of an Avalonia platform handle.");
+            }
+
+            return platformHandle;
+        }
+
+        if (TryGetNativeControlAttachment(out var nativeControlAttachment, out var defaultParentDescriptor))
+        {
+            var handle = nativeControlAttachment.AttachToNativeParent(
+                new NativePlatformHandle(parent.Handle, parent.HandleDescriptor ?? defaultParentDescriptor));
+            return new PlatformHandle(handle.Handle, handle.HandleDescriptor);
+        }
+
         return base.CreateNativeControlCore(parent);
     }
 
@@ -668,6 +688,20 @@ public class NativeWebView : NativeControlHost, IDisposable
         {
             _macOSHost.Dispose();
             _macOSHost = null;
+            return;
+        }
+
+        if (OperatingSystem.IsBrowser() &&
+            _controller.TryGetBackend<INativeWebViewManagedControlHandleProvider>(out var managedControlHandleProvider))
+        {
+            managedControlHandleProvider.ReleaseManagedControlHandle(control);
+            base.DestroyNativeControlCore(control);
+            return;
+        }
+
+        if (TryGetNativeControlAttachment(out var nativeControlAttachment, out _))
+        {
+            nativeControlAttachment.DetachFromNativeParent();
             return;
         }
 
@@ -737,6 +771,52 @@ public class NativeWebView : NativeControlHost, IDisposable
         {
             target.ApplyInstanceConfiguration(_instanceConfiguration.Clone());
         }
+    }
+
+    private bool TryGetNativeControlAttachment(
+        out INativeWebViewNativeControlAttachment nativeControlAttachment,
+        out string defaultParentDescriptor)
+    {
+        nativeControlAttachment = default!;
+        defaultParentDescriptor = string.Empty;
+
+        if (_controller.Platform == NativeWebViewPlatform.Windows &&
+            OperatingSystem.IsWindows() &&
+            _controller.TryGetBackend<INativeWebViewNativeControlAttachment>(out var windowsAttachment))
+        {
+            nativeControlAttachment = windowsAttachment;
+            defaultParentDescriptor = "HWND";
+            return true;
+        }
+
+        if (_controller.Platform == NativeWebViewPlatform.Linux &&
+            OperatingSystem.IsLinux() &&
+            _controller.TryGetBackend<INativeWebViewNativeControlAttachment>(out var linuxAttachment))
+        {
+            nativeControlAttachment = linuxAttachment;
+            defaultParentDescriptor = "XID";
+            return true;
+        }
+
+        if (_controller.Platform == NativeWebViewPlatform.IOS &&
+            OperatingSystem.IsIOS() &&
+            _controller.TryGetBackend<INativeWebViewNativeControlAttachment>(out var iosAttachment))
+        {
+            nativeControlAttachment = iosAttachment;
+            defaultParentDescriptor = "UIView";
+            return true;
+        }
+
+        if (_controller.Platform == NativeWebViewPlatform.Android &&
+            OperatingSystem.IsAndroid() &&
+            _controller.TryGetBackend<INativeWebViewNativeControlAttachment>(out var androidAttachment))
+        {
+            nativeControlAttachment = androidAttachment;
+            defaultParentDescriptor = "android.view.View";
+            return true;
+        }
+
+        return false;
     }
 
     private void OnCoreWebView2EnvironmentRequestedInternal(object? sender, CoreWebViewEnvironmentRequestedEventArgs e)
