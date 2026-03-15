@@ -1,1 +1,1 @@
-Sitemap: https://wieslawsoltes.github.io/NativeWebVIew/NativeWebVIew/sitemap.xml
+Sitemap: https://wieslawsoltes.github.io/NativeWebView/NativeWebView/sitemap.xml
