@@ -3,18 +3,21 @@ extend "lunet-io/templates"
 template_theme_default_mode = "system"
 
 site_project_baseurl = "https://wieslawsoltes.github.io"
-site_project_basepath = environment == "dev" ? "" : "/NativeWebVIew"
+site_project_basepath = environment == "dev" ? "" : "/NativeWebView"
 site_project_name = "NativeWebView"
 site_project_description = "Cross-platform native webview stack for Avalonia with embedded, GPU-surface, and offscreen rendering modes."
 site_project_logo_path = "/images/logo.svg"
 site_project_social_banner_path = "/images/logo.svg"
 site_project_package_id = "NativeWebView"
 site_project_github_user = "wieslawsoltes"
-site_project_github_repo = "NativeWebVIew"
+site_project_github_repo = "NativeWebView"
 site_project_owner_name = "Wieslaw Soltes"
 site_project_owner_alias = "wieslawsoltes"
 site_project_owner_url = "https://github.com/wieslawsoltes"
 site_project_twitter_user = "wieslawsoltes"
+site_project_content_license_name = "MIT"
+site_project_content_license_url = "https://github.com/wieslawsoltes/NativeWebView/blob/main/LICENSE"
+template_footer_content_license_html = $"- Content licensed under the <a href=\"{site_project_content_license_url}\">MIT license</a>"
 
 site_project_init
 

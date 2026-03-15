@@ -217,7 +217,7 @@ for package_id in "${packages[@]}"; do
     metadata_ok="No"
   fi
 
-  if ! grep -q '<projectUrl>https://github.com/wieslawsoltes/NativeWebVIew</projectUrl>' <<< "$nuspec_content"; then
+  if ! grep -q '<projectUrl>https://github.com/wieslawsoltes/NativeWebView</projectUrl>' <<< "$nuspec_content"; then
     record_failure "$package_id" "Package project URL metadata is missing."
     metadata_ok="No"
   fi

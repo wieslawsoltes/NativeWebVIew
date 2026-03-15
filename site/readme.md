@@ -14,7 +14,7 @@ og_type: website
     <a class="btn btn-primary btn-lg" href="articles/getting-started/overview"><i class="bi bi-rocket-takeoff" aria-hidden="true"></i> Start Getting Started</a>
     <a class="btn btn-outline-secondary btn-lg" href="articles/rendering/render-modes"><i class="bi bi-layers" aria-hidden="true"></i> Explore Render Modes</a>
     <a class="btn btn-outline-secondary btn-lg" href="api"><i class="bi bi-braces" aria-hidden="true"></i> Browse API</a>
-    <a class="btn btn-outline-secondary btn-lg" href="https://github.com/wieslawsoltes/NativeWebVIew"><i class="bi bi-github" aria-hidden="true"></i> GitHub Repository</a>
+    <a class="btn btn-outline-secondary btn-lg" href="https://github.com/wieslawsoltes/NativeWebView"><i class="bi bi-github" aria-hidden="true"></i> GitHub Repository</a>
   </div>
 </div>
 
@@ -78,5 +78,5 @@ og_type: website
 
 ## Repository
 
-- Source code and issues: [github.com/wieslawsoltes/NativeWebVIew](https://github.com/wieslawsoltes/NativeWebVIew)
-- Published documentation: [wieslawsoltes.github.io/NativeWebVIew](https://wieslawsoltes.github.io/NativeWebVIew)
+- Source code and issues: [github.com/wieslawsoltes/NativeWebView](https://github.com/wieslawsoltes/NativeWebView)
+- Published documentation: [wieslawsoltes.github.io/NativeWebView](https://wieslawsoltes.github.io/NativeWebView)

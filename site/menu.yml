@@ -4,4 +4,4 @@ home:
   - {path: api/readme.md, title: "<i class='bi bi-braces' aria-hidden='true'></i> API", folder: true}
 
 home2:
-  - {url: "https://github.com/wieslawsoltes/NativeWebVIew", title: '<i class="bi bi-github"></i> GitHub', link_class: btn btn-info}
+  - {url: "https://github.com/wieslawsoltes/NativeWebView", title: '<i class="bi bi-github"></i> GitHub', link_class: btn btn-info}

@@ -146,13 +146,13 @@ Generate release-facing diagnostics and gate artifacts:
 
 ## Documentation
 
-- Hosted docs: [wieslawsoltes.github.io/NativeWebVIew](https://wieslawsoltes.github.io/NativeWebVIew/)
-- Getting started: [Quickstart](https://wieslawsoltes.github.io/NativeWebVIew/articles/getting-started/quickstart/)
-- Control surface: [NativeWebView](https://wieslawsoltes.github.io/NativeWebVIew/articles/controls/nativewebview/)
-- Rendering and interop: [Render Modes](https://wieslawsoltes.github.io/NativeWebVIew/articles/rendering/render-modes/)
-- Platform notes: [Platforms](https://wieslawsoltes.github.io/NativeWebVIew/articles/platforms/)
-- Diagnostics and operations: [Diagnostics](https://wieslawsoltes.github.io/NativeWebVIew/articles/diagnostics/)
-- API reference: [wieslawsoltes.github.io/NativeWebVIew/api](https://wieslawsoltes.github.io/NativeWebVIew/api)
+- Hosted docs: [wieslawsoltes.github.io/NativeWebView](https://wieslawsoltes.github.io/NativeWebView/)
+- Getting started: [Quickstart](https://wieslawsoltes.github.io/NativeWebView/articles/getting-started/quickstart/)
+- Control surface: [NativeWebView](https://wieslawsoltes.github.io/NativeWebView/articles/controls/nativewebview/)
+- Rendering and interop: [Render Modes](https://wieslawsoltes.github.io/NativeWebView/articles/rendering/render-modes/)
+- Platform notes: [Platforms](https://wieslawsoltes.github.io/NativeWebView/articles/platforms/)
+- Diagnostics and operations: [Diagnostics](https://wieslawsoltes.github.io/NativeWebView/articles/diagnostics/)
+- API reference: [wieslawsoltes.github.io/NativeWebView/api](https://wieslawsoltes.github.io/NativeWebView/api)
 
 ## CI and Release
 
