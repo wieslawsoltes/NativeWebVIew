@@ -1,10 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOST="${DOCS_HOST:-127.0.0.1}"
 PORT="${DOCS_PORT:-8080}"
 
+clean_docs_outputs() {
+    find "${SCRIPT_DIR}/src" -path '*/obj/Release/*/NativeWebView*.api.json' -delete
+    rm -rf "${SCRIPT_DIR}/site/.lunet/build/cache/api/dotnet" \
+           "${SCRIPT_DIR}/site/.lunet/build/www"
+}
+
+cd "${SCRIPT_DIR}"
 dotnet tool restore
+clean_docs_outputs
 cd site
 
 if command -v python3 >/dev/null 2>&1; then
@@ -16,6 +25,33 @@ else
     dotnet tool run lunet --stacktrace serve
     exit 0
 fi
+
+find_available_port() {
+    local host="$1"
+    local port="$2"
+
+    while ! "$PYTHON_BIN" - "$host" "$port" <<'PY'
+import socket
+import sys
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        sock.bind((host, port))
+    except OSError:
+        sys.exit(1)
+PY
+    do
+        port=$((port + 1))
+    done
+
+    printf '%s\n' "$port"
+}
+
+PORT="$(find_available_port "$HOST" "$PORT")"
 
 dotnet tool run lunet --stacktrace build --dev
 
