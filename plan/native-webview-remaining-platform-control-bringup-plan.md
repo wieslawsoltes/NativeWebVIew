@@ -15,20 +15,20 @@ Review the actual `NativeWebView` control implementation status for every non-ma
   - iOS through backend-owned `UIView` attachment and `WKWebView` hosting when the iOS backend is built with the .NET 8 Apple workload
 - Android through backend-owned child `View` attachment and `android.webkit.WebView` hosting when the Android backend is built with the .NET 8 Android workload
 - Browser now ships a real browser-targeted `NativeWebView` runtime backed by Avalonia Browser native control hosting plus a DOM `iframe` bridge.
-- Windows and Linux dialog backends are also stub implementations; mobile/browser dialog backends are intentionally unregistered.
-- All `*WebAuthenticationBrokerBackend` implementations are currently `WebAuthenticationBrokerStubBase`.
+- Windows, macOS, and Linux now also ship real `NativeWebDialog` runtime paths; mobile/browser dialog backends remain intentionally unregistered.
+- `WebAuthenticationBroker` now has runtime implementations across all supported platforms, with platform-specific limits documented separately.
 - The shared control project still targets `net8.0`, but backend-owned native attachment is now sufficient for Windows, Linux, iOS, and Android without adding more control-assembly target forks.
 
 ### Actual current repo runtime status
 
 | Platform | `NativeWebView` control | `NativeWebDialog` | `WebAuthenticationBroker` | Notes |
 | --- | --- | --- | --- | --- |
-| Windows | Implemented | Contract-only | Contract-only | Embedded control is backed by a real child HWND + WebView2 runtime path; dialog/auth remain stubbed. |
-| Linux | Implemented | Contract-only | Contract-only | Embedded control is backed by a real GTK3/WebKitGTK child host on X11; dialog/auth remain stubbed. |
-| iOS | Implemented | Unsupported | Contract-only | Embedded control is backed by a real `UIView` + `WKWebView` runtime path when the iOS backend is built with the .NET 8 Apple workload. |
-| Android | Implemented | Unsupported | Contract-only | Embedded control is backed by a real child `View` + `android.webkit.WebView` runtime path when the Android backend is built with the .NET 8 Android workload. |
-| Browser | Implemented | Unsupported | Contract-only | Embedded control is backed by a real Avalonia Browser native host + DOM `iframe` runtime path; same-origin script/messaging limits and frame-embedding restrictions still apply. |
-| macOS | Implemented | Implemented | Contract-only | Current real embedded/dialog runtime path. |
+| Windows | Implemented | Implemented | Implemented | Embedded control is backed by a real child HWND + WebView2 runtime path; dialog/auth use real native windows and WebView2 sessions. |
+| Linux | Implemented | Implemented | Implemented | Embedded control is backed by a real GTK3/WebKitGTK child host on X11; dialog/auth use real GTK/WebKitGTK windows and sessions on X11. |
+| iOS | Implemented | Unsupported | Implemented | Embedded control is backed by a real `UIView` + `WKWebView` runtime path when the iOS backend is built with the .NET 8 Apple workload; auth uses a modal `WKWebView`. |
+| Android | Implemented | Unsupported | Implemented | Embedded control is backed by a real child `View` + `android.webkit.WebView` runtime path when the Android backend is built with the .NET 8 Android workload; auth uses a dedicated activity-hosted `WebView`. |
+| Browser | Implemented | Unsupported | Implemented | Embedded control is backed by a real Avalonia Browser native host + DOM `iframe` runtime path; auth uses popup/browser APIs and inherits browser popup/origin limits. |
+| macOS | Implemented | Implemented | Implemented | Current real embedded/dialog runtime path plus dialog-backed auth. |
 
 ## Recommended Bring-Up Order
 

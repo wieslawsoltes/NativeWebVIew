@@ -68,6 +68,8 @@ WebViewControl.InstanceConfiguration.ControllerOptions.ProfileName = "view-a";
 
 Runtime note: only assign `EnvironmentOptions.Proxy` when `NativeWebViewProxyPlatformSupportMatrix.Get(...)` reports runtime support for your target. Per-instance proxy application is implemented on the embedded Windows and Linux `NativeWebView` controls, on macOS 14+ for `NativeWebView` and `NativeWebDialog`, and on iOS 17+ for the embedded iOS `NativeWebView` control. Linux currently applies explicit server proxies on the X11 path; `AutoConfigUrl` and embedded proxy credentials remain unsupported there, and Android remains app-wide proxy only.
 
+If your flow needs a separate desktop window instead of an embedded control, switch to [`NativeWebDialog`](../controls/nativewebdialog.md). If your flow only needs an authentication callback, use [`WebAuthenticationBroker`](../controls/webauthenticationbroker.md) instead; it is implemented across the current Windows, macOS, Linux, iOS, Android, and Browser runtime paths.
+
 ## 3. Validate Diagnostics Before Navigation
 
 ```csharp

@@ -15,7 +15,7 @@ dotnet add package NativeWebView.Platform.Windows
 
 Replace `NativeWebView.Platform.Windows` with `NativeWebView.Platform.macOS`, `NativeWebView.Platform.Linux`, `NativeWebView.Platform.iOS`, `NativeWebView.Platform.Android`, or `NativeWebView.Platform.Browser` as needed.
 
-Package installation and backend registration are broader than the current repo runtime implementation. Check `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` before treating a target as production-ready.
+Package installation and backend registration are broader than any single surface's runtime status. Check `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` before treating a specific `NativeWebView`, `NativeWebDialog`, or `WebAuthenticationBroker` target as production-ready.
 
 Optional facades:
 
@@ -23,6 +23,10 @@ Optional facades:
 dotnet add package NativeWebView.Dialog
 dotnet add package NativeWebView.Auth
 ```
+
+- `NativeWebView.Dialog` is meaningful on the desktop runtime paths: Windows, macOS, and Linux.
+- `NativeWebView.Auth` is implemented across the current Windows, macOS, Linux, iOS, Android, and Browser runtime paths.
+- iOS and Android runtime support comes from their platform-targeted backend assemblies rather than the default `net8.0` contract build.
 
 ## Package Layout
 
@@ -52,7 +56,7 @@ var factory = new NativeWebViewBackendFactory();
 factory.UseNativeWebViewWindows();
 ```
 
-This registers the Windows capability contract and the current repo now also ships a real embedded Windows `NativeWebView` control host. `NativeWebDialog` and `WebAuthenticationBroker` on Windows remain contract-only.
+This registers the Windows capability contract, and the current repo now also ships real Windows runtime paths for `NativeWebView`, `NativeWebDialog`, and `WebAuthenticationBroker`.
 
 If you rely on default constructors, runtime auto-registration is available:
 

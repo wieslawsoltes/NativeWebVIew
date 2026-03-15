@@ -8,6 +8,8 @@ title: "NativeWebView"
 
 Current repo runtime status: the embedded native host path is implemented on Windows, macOS, Linux, iOS, Android, and Browser. Linux uses a GTK3/WebKitGTK child host on X11. iOS and Android runtime support comes from their platform-targeted backend assemblies rather than the default `net8.0` contract build. Browser uses Avalonia Browser native hosting plus an embedded `iframe`; navigation is real, but script execution and `window.chrome.webview`-style messaging are limited by same-origin browser security rules. Use `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` when you need the honest current repo status.
 
+Companion surfaces are available when embedding is not the right fit: [`NativeWebDialog`](nativewebdialog.md) for desktop popup windows and [`WebAuthenticationBroker`](webauthenticationbroker.md) for auth callback flows.
+
 ## Core Capabilities
 
 - Navigation lifecycle and history state.
@@ -101,7 +103,7 @@ Use `NativeWebViewRenderFrameMetadataSerializer.ReadFromFileAsync` to load the s
 - The Linux runtime path applies explicit proxy settings through WebKitGTK website data manager settings on X11.
 - The Android runtime path is real, but Android proxy override remains app-wide and is not applied per `WebView` instance by this repo.
 - The Browser runtime path is real, but browser security rules still apply: pages may refuse framing, and cross-origin pages cannot be script-driven through the embedded iframe host.
-- `Proxy.AutoConfigUrl` is not applied by the current macOS integration.
+- `Proxy.AutoConfigUrl` is not applied by the current Apple runtime integrations in this repo.
 
 ## Related
 

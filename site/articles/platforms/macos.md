@@ -14,7 +14,7 @@ title: "macOS"
 
 - `NativeWebView`: implemented.
 - `NativeWebDialog`: implemented.
-- `WebAuthenticationBroker`: contract-only.
+- `WebAuthenticationBroker`: implemented through the macOS dialog runtime and a `WKWebView` auth window.
 - Check `NativeWebViewPlatformImplementationStatusMatrix.Get(NativeWebViewPlatform.MacOS)` when you need to distinguish implemented runtime paths from broader capability contracts.
 
 ## Platform Engine Capability
@@ -47,3 +47,8 @@ macOS supports composited hosting paths and passthrough decisions for scenarios 
 - The current runtime path uses a dedicated persistent `WKWebsiteDataStore` identity derived from the instance configuration.
 - Explicit `http`, `https`, and `socks5` proxy servers plus bypass domains are supported.
 - PAC (`AutoConfigUrl`) is not applied by the current macOS integration.
+
+## Authentication Notes
+
+- The current macOS `WebAuthenticationBroker` implementation uses a dedicated dialog-hosted `WKWebView` session and completes when navigation reaches the callback scheme/host/path.
+- `UseHttpPost` is not currently implemented on the macOS runtime path.
