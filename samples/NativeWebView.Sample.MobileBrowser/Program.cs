@@ -135,9 +135,10 @@ static async Task RunPlatformChecksAsync(
         {
             await ExecuteCheckAsync(platform, "Authenticate interactive", checks, async () =>
             {
+                var callbackUri = new Uri("https://example.com/callback");
                 var result = await authBackend.AuthenticateAsync(
-                    new Uri("https://example.com/auth"),
-                    new Uri("https://example.com/callback"),
+                    CreateImmediateSuccessRequestUri(platform, callbackUri),
+                    callbackUri,
                     WebAuthenticationOptions.UseTitle);
 
                 if (result.ResponseStatus != WebAuthenticationStatus.Success)
@@ -247,4 +248,12 @@ static void RequireHandle(bool available, NativePlatformHandle handle, string sc
     {
         throw new InvalidOperationException($"{scope} handle descriptor is empty.");
     }
+}
+
+static Uri CreateImmediateSuccessRequestUri(NativeWebViewPlatform platform, Uri callbackUri)
+{
+    ArgumentNullException.ThrowIfNull(callbackUri);
+
+    var platformName = platform.ToString().ToLowerInvariant();
+    return new Uri($"{callbackUri}?platform={platformName}#result=success");
 }

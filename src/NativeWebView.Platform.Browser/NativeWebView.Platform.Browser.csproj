@@ -1,5 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework />
+    <HasBrowserRuntimeSdk>false</HasBrowserRuntimeSdk>
+    <HasBrowserRuntimeSdk Condition="Exists('/usr/local/share/dotnet/packs/Microsoft.NET.Runtime.WebAssembly.Sdk')">true</HasBrowserRuntimeSdk>
+    <HasBrowserRuntimeSdk Condition="Exists('/usr/share/dotnet/packs/Microsoft.NET.Runtime.WebAssembly.Sdk')">true</HasBrowserRuntimeSdk>
+    <EnableBrowserRuntime Condition="'$(EnableBrowserRuntime)' == '' and '$(HasBrowserRuntimeSdk)' == 'true'">true</EnableBrowserRuntime>
+    <EnableBrowserRuntime Condition="'$(EnableBrowserRuntime)' == ''">false</EnableBrowserRuntime>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(EnableBrowserRuntime)' == 'true'">net8.0;net8.0-browser1.0</TargetFrameworks>
     <AssemblyName>NativeWebView.Platform.Browser</AssemblyName>
     <RootNamespace>NativeWebView.Platform.Browser</RootNamespace>
     <PackageId>NativeWebView.Platform.Browser</PackageId>
@@ -7,10 +15,35 @@
     <PackageTags>$(PackageTags);Browser;WASM;WebAssembly</PackageTags>
     <IsPackable>true</IsPackable>
     <DefineConstants>$(DefineConstants);NATIVEWEBVIEW_PLATFORM_BROWSER</DefineConstants>
+    <EmbeddedControlRuntimeImplemented>false</EmbeddedControlRuntimeImplemented>
+    <AuthenticationBrokerRuntimeImplemented>false</AuthenticationBrokerRuntimeImplemented>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-browser1.0'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <DefineConstants>$(DefineConstants);NATIVEWEBVIEW_BROWSER_RUNTIME</DefineConstants>
+    <EmbeddedControlRuntimeImplemented>true</EmbeddedControlRuntimeImplemented>
+    <AuthenticationBrokerRuntimeImplemented>true</AuthenticationBrokerRuntimeImplemented>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../NativeWebView.Core/NativeWebView.Core.csproj" />
     <ProjectReference Include="../NativeWebView.Interop/NativeWebView.Interop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="NativeWebView.EmbeddedControlRuntime" Value="$(EmbeddedControlRuntimeImplemented)" />
+    <AssemblyMetadata Include="NativeWebView.AuthenticationBrokerRuntime" Value="$(AuthenticationBrokerRuntimeImplemented)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-browser1.0'">
+    <PackageReference Include="Avalonia.Browser" />
+    <Compile Remove="BrowserNativeWebViewBackend.Stub.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-browser1.0'">
+    <Compile Remove="BrowserNativeWebViewBackend.Browser.cs" />
+    <Compile Remove="BrowserNativeWebViewInterop.Browser.cs" />
   </ItemGroup>
 </Project>

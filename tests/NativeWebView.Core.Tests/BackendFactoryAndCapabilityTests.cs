@@ -1,6 +1,8 @@
 using NativeWebView.Core;
+using NativeWebView.Interop;
 using NativeWebView.Platform.Android;
 using NativeWebView.Platform.Browser;
+using NativeWebView.Platform.Linux;
 using NativeWebView.Platform.Windows;
 using NativeWebView.Platform.iOS;
 
@@ -56,6 +58,127 @@ public sealed class BackendFactoryAndCapabilityTests
 
         Assert.Equal(1, environmentRequestedCount);
         Assert.Equal(1, controllerRequestedCount);
+    }
+
+    [Fact]
+    public async Task DesktopRuntimeBackends_ApplyStoredInstanceConfigurationBeforePublicOptionHandlers()
+    {
+        var backends = new INativeWebViewBackend[]
+        {
+            new WindowsNativeWebViewBackend(),
+            new LinuxNativeWebViewBackend(),
+        };
+
+        foreach (var backend in backends)
+        {
+            using (backend)
+            {
+                var configurationTarget = Assert.IsAssignableFrom<INativeWebViewInstanceConfigurationTarget>(backend);
+                configurationTarget.ApplyInstanceConfiguration(new NativeWebViewInstanceConfiguration
+                {
+                    EnvironmentOptions =
+                    {
+                        UserDataFolder = $"/tmp/{backend.Platform.ToString().ToLowerInvariant()}/user-data",
+                        Proxy = new NativeWebViewProxyOptions
+                        {
+                            Server = "http://configured-proxy.example.com:8080",
+                        },
+                    },
+                    ControllerOptions =
+                    {
+                        ProfileName = $"{backend.Platform}-profile",
+                    },
+                });
+
+                NativeWebViewEnvironmentOptions? capturedEnvironment = null;
+                NativeWebViewControllerOptions? capturedController = null;
+
+                backend.CoreWebView2EnvironmentRequested += (_, e) => capturedEnvironment = e.Options.Clone();
+                backend.CoreWebView2ControllerOptionsRequested += (_, e) => capturedController = e.Options.Clone();
+
+                await backend.InitializeAsync();
+
+                Assert.NotNull(capturedEnvironment);
+                Assert.NotNull(capturedController);
+                Assert.Equal($"/tmp/{backend.Platform.ToString().ToLowerInvariant()}/user-data", capturedEnvironment!.UserDataFolder);
+                Assert.Equal("http://configured-proxy.example.com:8080", capturedEnvironment.Proxy?.Server);
+                Assert.Equal($"{backend.Platform}-profile", capturedController!.ProfileName);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task CompiledBackends_RejectInvalidJsonMessages()
+    {
+        var backends = new INativeWebViewBackend[]
+        {
+            new WindowsNativeWebViewBackend(),
+            new LinuxNativeWebViewBackend(),
+            new BrowserNativeWebViewBackend(),
+        };
+
+        foreach (var backend in backends)
+        {
+            using (backend)
+            {
+                var exception = await Assert.ThrowsAsync<ArgumentException>(
+                    () => backend.PostWebMessageAsJsonAsync("{ invalid json }"));
+                Assert.Equal("message", exception.ParamName);
+            }
+        }
+    }
+
+    [Fact]
+    public void BrowserBackend_ExposesDistinctSyntheticHandlesPerInstance()
+    {
+        var factory = new NativeWebViewBackendFactory();
+        factory.UseNativeWebViewBrowser();
+
+        Assert.True(factory.TryCreateNativeWebViewBackend(NativeWebViewPlatform.Browser, out var firstBackend));
+        Assert.True(factory.TryCreateNativeWebViewBackend(NativeWebViewPlatform.Browser, out var secondBackend));
+
+        using (firstBackend)
+        using (secondBackend)
+        {
+            var firstProvider = Assert.IsAssignableFrom<INativeWebViewPlatformHandleProvider>(firstBackend);
+            var secondProvider = Assert.IsAssignableFrom<INativeWebViewPlatformHandleProvider>(secondBackend);
+
+            Assert.True(firstProvider.TryGetPlatformHandle(out var firstPlatformHandle));
+            Assert.True(firstProvider.TryGetViewHandle(out var firstViewHandle));
+            Assert.True(firstProvider.TryGetControllerHandle(out var firstControllerHandle));
+            Assert.True(secondProvider.TryGetPlatformHandle(out var secondPlatformHandle));
+            Assert.True(secondProvider.TryGetViewHandle(out var secondViewHandle));
+            Assert.True(secondProvider.TryGetControllerHandle(out var secondControllerHandle));
+
+            Assert.NotEqual(firstPlatformHandle.Handle, secondPlatformHandle.Handle);
+            Assert.NotEqual(firstViewHandle.Handle, secondViewHandle.Handle);
+            Assert.NotEqual(firstControllerHandle.Handle, secondControllerHandle.Handle);
+        }
+    }
+
+    [Fact]
+    public void BrowserInteropInstallScript_RestrictsHostMessagesToParentWindow()
+    {
+        var installScript = File.ReadAllText(BrowserInteropSourcePath);
+
+        Assert.Contains("event.source !== frameWindow.parent", installScript);
+    }
+
+    [Fact]
+    public void BrowserInteropInstallScript_ReturnsPopupProxyInsteadOfFrameWindow()
+    {
+        var installScript = File.ReadAllText(BrowserInteropSourcePath);
+
+        Assert.Contains("const createPopupProxy = (initialUrl) =>", installScript);
+        Assert.Contains("return createPopupProxy(normalizedUrl);", installScript);
+        Assert.DoesNotContain("return frameWindow;", installScript);
+    }
+
+    [Fact]
+    public void WindowsBackend_NormalizeRuntimeUserAgent_ClearsNullOverride()
+    {
+        Assert.Equal(string.Empty, WindowsNativeWebViewBackend.NormalizeRuntimeUserAgent(null));
+        Assert.Equal("custom-agent", WindowsNativeWebViewBackend.NormalizeRuntimeUserAgent("custom-agent"));
     }
 
     [Fact]
@@ -135,4 +258,7 @@ public sealed class BackendFactoryAndCapabilityTests
             Assert.NotEqual(0, result.ResponseErrorDetail);
         }
     }
+
+    private static readonly string BrowserInteropSourcePath =
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../src/NativeWebView.Platform.Browser/BrowserNativeWebViewInterop.Browser.cs"));
 }

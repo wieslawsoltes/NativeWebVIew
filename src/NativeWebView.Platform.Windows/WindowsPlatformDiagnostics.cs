@@ -7,6 +7,7 @@ internal static class WindowsPlatformDiagnostics
     public static NativeWebViewPlatformDiagnostics Create()
     {
         var issues = new List<NativeWebViewDiagnosticIssue>();
+        AddContractOnlyControlWarning(issues);
 
         if (!NativeWebViewDiagnosticsHostPlatformOverride.IsEffectiveHostPlatform(NativeWebViewPlatform.Windows))
         {
@@ -50,5 +51,18 @@ internal static class WindowsPlatformDiagnostics
             NativeWebViewPlatform.Windows,
             providerName: nameof(WindowsPlatformDiagnostics),
             issues);
+    }
+
+    private static void AddContractOnlyControlWarning(List<NativeWebViewDiagnosticIssue> issues)
+    {
+        var implementationStatus = NativeWebViewPlatformImplementationStatusMatrix.Get(NativeWebViewPlatform.Windows);
+        if (implementationStatus.EmbeddedControl != NativeWebViewRepositoryImplementationStatus.RuntimeImplemented)
+        {
+            issues.Add(new NativeWebViewDiagnosticIssue(
+                code: "windows.control.contract_only",
+                severity: NativeWebViewDiagnosticSeverity.Warning,
+                message: "Windows currently registers the NativeWebView control contract, but the embedded control runtime is not implemented in this repo yet.",
+                recommendation: "Treat Windows embedded control support as planned work and check NativeWebViewPlatformImplementationStatusMatrix before shipping."));
+        }
     }
 }

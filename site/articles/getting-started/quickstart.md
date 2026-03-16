@@ -19,13 +19,30 @@ This walkthrough uses the default constructor and runtime auto-registration, whi
 </Window>
 ```
 
-## 2. Register the Current Platform and Initialize
+## 2. Check Runtime Status, Register the Current Platform, and Initialize
 
 ```csharp
 using NativeWebView.Controls;
 using NativeWebView.Core;
 
 NativeWebViewRuntime.EnsureCurrentPlatformRegistered();
+
+var implementationStatus = NativeWebViewPlatformImplementationStatusMatrix.Get(
+    NativeWebViewRuntime.CurrentPlatform);
+
+if (implementationStatus.EmbeddedControl != NativeWebViewRepositoryImplementationStatus.RuntimeImplemented)
+{
+    throw new PlatformNotSupportedException(
+        $"The embedded NativeWebView control is not implemented on {NativeWebViewRuntime.CurrentPlatform} in the current repo yet.");
+}
+
+if (!NativeWebViewRuntime.Factory.TryCreateNativeWebViewBackend(
+        NativeWebViewRuntime.CurrentPlatform,
+        out _))
+{
+    throw new InvalidOperationException(
+        $"The platform package for {NativeWebViewRuntime.CurrentPlatform} is not registered. Reference the matching NativeWebView.Platform.* package.");
+}
 
 await WebViewControl.InitializeAsync();
 WebViewControl.RenderMode = NativeWebViewRenderMode.GpuSurface;
@@ -46,15 +63,12 @@ WebViewControl.InstanceConfiguration.EnvironmentOptions.UserDataFolder = "./arti
 WebViewControl.InstanceConfiguration.EnvironmentOptions.CacheFolder = "./artifacts/view-a/cache";
 WebViewControl.InstanceConfiguration.EnvironmentOptions.CookieDataFolder = "./artifacts/view-a/cookies";
 WebViewControl.InstanceConfiguration.EnvironmentOptions.SessionDataFolder = "./artifacts/view-a/session";
-WebViewControl.InstanceConfiguration.EnvironmentOptions.Proxy = new NativeWebViewProxyOptions
-{
-    Server = "http://localhost:8888",
-    BypassList = "localhost;127.0.0.1"
-};
 WebViewControl.InstanceConfiguration.ControllerOptions.ProfileName = "view-a";
 ```
 
-Runtime note: per-instance proxy application is currently implemented on macOS 14+ for `NativeWebView` and `NativeWebDialog`. Other targets keep the configuration contract but do not yet apply proxy settings in the current repo implementation.
+Runtime note: only assign `EnvironmentOptions.Proxy` when `NativeWebViewProxyPlatformSupportMatrix.Get(...)` reports runtime support for your target. Per-instance proxy application is implemented on the embedded Windows and Linux `NativeWebView` controls, on macOS 14+ for `NativeWebView` and `NativeWebDialog`, and on iOS 17+ for the embedded iOS `NativeWebView` control. Linux currently applies explicit server proxies on the X11 path; `AutoConfigUrl` and embedded proxy credentials remain unsupported there, and Android remains app-wide proxy only.
+
+If your flow needs a separate desktop window instead of an embedded control, switch to [`NativeWebDialog`](../controls/nativewebdialog.md). If your flow only needs an authentication callback, use [`WebAuthenticationBroker`](../controls/webauthenticationbroker.md) instead; it is implemented across the current Windows, macOS, Linux, iOS, Android, and Browser runtime paths.
 
 ## 3. Validate Diagnostics Before Navigation
 
@@ -91,17 +105,17 @@ if (WebViewControl.RenderMode != NativeWebViewRenderMode.Embedded)
 
 ## 5. Optional Low-Level Backend Creation
 
-If you want explicit backend composition instead of runtime auto-registration:
+If you want explicit backend composition instead of runtime auto-registration on the currently implemented embedded runtime path:
 
 ```csharp
 using NativeWebView.Controls;
 using NativeWebView.Core;
-using NativeWebView.Platform.Windows;
+using NativeWebView.Platform.macOS;
 
 var factory = new NativeWebViewBackendFactory()
-    .UseNativeWebViewWindows();
+    .UseNativeWebViewMacOS();
 
-if (!factory.TryCreateNativeWebViewBackend(NativeWebViewPlatform.Windows, out var backend))
+if (!factory.TryCreateNativeWebViewBackend(NativeWebViewPlatform.MacOS, out var backend))
 {
     throw new InvalidOperationException("Backend not registered.");
 }
@@ -147,5 +161,6 @@ dotnet run --project samples/NativeWebView.Sample.Desktop/NativeWebView.Sample.D
 ## Next
 
 - Read [NativeWebView](../controls/nativewebview.md) for the full control surface.
+- Read [Platform Support Matrix](../reference/platform-support-matrix.md) before treating a target as runtime-complete.
 - Read [Render Modes](../rendering/render-modes.md) before enabling composited rendering in production.
 - Run the [Sample Feature Explorer](sample-feature-explorer.md) to exercise the full feature set.

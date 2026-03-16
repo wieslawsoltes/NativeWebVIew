@@ -14,6 +14,7 @@ internal static class BrowserPlatformDiagnostics
     internal static NativeWebViewPlatformDiagnostics Create(bool isBrowserHost, string? popupSupport)
     {
         var issues = new List<NativeWebViewDiagnosticIssue>();
+        AddContractOnlyControlWarning(issues);
         if (!isBrowserHost)
         {
             issues.Add(new NativeWebViewDiagnosticIssue(
@@ -47,5 +48,18 @@ internal static class BrowserPlatformDiagnostics
             NativeWebViewPlatform.Browser,
             providerName: nameof(BrowserPlatformDiagnostics),
             issues);
+    }
+
+    private static void AddContractOnlyControlWarning(List<NativeWebViewDiagnosticIssue> issues)
+    {
+        var implementationStatus = NativeWebViewPlatformImplementationStatusMatrix.Get(NativeWebViewPlatform.Browser);
+        if (implementationStatus.EmbeddedControl != NativeWebViewRepositoryImplementationStatus.RuntimeImplemented)
+        {
+            issues.Add(new NativeWebViewDiagnosticIssue(
+                code: "browser.control.contract_only",
+                severity: NativeWebViewDiagnosticSeverity.Warning,
+                message: "Browser currently registers the NativeWebView control contract, but this build does not include the browser-targeted embedded control runtime.",
+                recommendation: "Build the browser-targeted backend assembly and check NativeWebViewPlatformImplementationStatusMatrix before shipping embedded control support."));
+        }
     }
 }

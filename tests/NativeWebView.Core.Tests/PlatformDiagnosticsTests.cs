@@ -88,4 +88,54 @@ public sealed class PlatformDiagnosticsTests
         Assert.Equal(NativeWebViewRuntime.CurrentPlatform, diagnostics.Platform);
         Assert.NotEmpty(diagnostics.Issues);
     }
+
+    [Fact]
+    public void NoImplementedEmbeddedPlatforms_ReportContractOnlyWarnings()
+    {
+        var platforms = new (NativeWebViewPlatform Platform, Action<NativeWebViewBackendFactory> Register, string IssueCode)[]
+        {
+        };
+
+        foreach (var (platform, register, issueCode) in platforms)
+        {
+            var factory = new NativeWebViewBackendFactory();
+            register(factory);
+
+            Assert.True(factory.TryGetPlatformDiagnostics(platform, out var diagnostics));
+            Assert.Contains(diagnostics.Issues, issue => issue.Code == issueCode);
+        }
+    }
+
+    [Fact]
+    public void EmbeddedControlContractOnlyWarning_MatchesImplementationStatus()
+    {
+        var platforms = new (NativeWebViewPlatform Platform, Action<NativeWebViewBackendFactory> Register, string IssueCode)[]
+        {
+            (NativeWebViewPlatform.Windows, static factory => factory.UseNativeWebViewWindows(), "windows.control.contract_only"),
+            (NativeWebViewPlatform.Linux, static factory => factory.UseNativeWebViewLinux(), "linux.control.contract_only"),
+            (NativeWebViewPlatform.MacOS, static factory => factory.UseNativeWebViewMacOS(), "macos.control.contract_only"),
+            (NativeWebViewPlatform.IOS, static factory => factory.UseNativeWebViewIOS(), "ios.control.contract_only"),
+            (NativeWebViewPlatform.Android, static factory => factory.UseNativeWebViewAndroid(), "android.control.contract_only"),
+            (NativeWebViewPlatform.Browser, static factory => factory.UseNativeWebViewBrowser(), "browser.control.contract_only"),
+        };
+
+        foreach (var (platform, register, issueCode) in platforms)
+        {
+            var factory = new NativeWebViewBackendFactory();
+            register(factory);
+
+            Assert.True(factory.TryGetPlatformDiagnostics(platform, out var diagnostics));
+            var shouldWarn = NativeWebViewPlatformImplementationStatusMatrix.Get(platform).EmbeddedControl !=
+                NativeWebViewRepositoryImplementationStatus.RuntimeImplemented;
+
+            if (shouldWarn)
+            {
+                Assert.Contains(diagnostics.Issues, issue => issue.Code == issueCode);
+            }
+            else
+            {
+                Assert.DoesNotContain(diagnostics.Issues, issue => issue.Code == issueCode);
+            }
+        }
+    }
 }

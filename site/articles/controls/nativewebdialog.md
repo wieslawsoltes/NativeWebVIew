@@ -8,9 +8,9 @@ title: "NativeWebDialog"
 
 ## Availability
 
-- Windows: supported.
-- macOS: supported.
-- Linux: supported.
+- Windows: implemented.
+- macOS: implemented.
+- Linux: implemented.
 - iOS, Android, Browser: unsupported by design in the current implementation.
 
 ## Main Properties
@@ -50,11 +50,6 @@ using NativeWebView.Core;
 NativeWebViewRuntime.EnsureCurrentPlatformRegistered();
 
 using var dialog = new NativeWebDialog();
-dialog.InstanceConfiguration.EnvironmentOptions.Proxy = new NativeWebViewProxyOptions
-{
-    Server = "http://localhost:8888",
-    BypassList = "localhost;127.0.0.1"
-};
 dialog.Show(new NativeWebDialogShowOptions
 {
     Title = "NativeWebView Sample Dialog",
@@ -66,7 +61,9 @@ dialog.Navigate("https://example.com/dialog");
 
 ## Notes
 
-- Dialog backends remain capability-driven just like the embedded control.
-- In the current repo implementation, per-instance proxy application is effective on macOS 14+ only.
+- Dialog backends remain capability-driven just like the embedded control. Real dialog runtime paths now exist on Windows, macOS, and Linux.
+- Check `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` when you need to distinguish implemented dialog paths from unsupported mobile/browser targets.
+- Windows and Linux dialog backends reuse the same WebView2/WebKitGTK runtime pipelines as their embedded `NativeWebView` hosts, so per-instance storage and proxy options flow through `InstanceConfiguration`.
+- In the current repo implementation, per-instance proxy application is effective on Windows, Linux, and macOS 14+ dialog runtime paths.
 - Print UI and DevTools depend on the platform backend.
 - Unsupported mobile/browser targets return unsupported backend contracts instead of silently no-op behavior.

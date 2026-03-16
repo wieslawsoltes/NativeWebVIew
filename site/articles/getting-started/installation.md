@@ -15,12 +15,18 @@ dotnet add package NativeWebView.Platform.Windows
 
 Replace `NativeWebView.Platform.Windows` with `NativeWebView.Platform.macOS`, `NativeWebView.Platform.Linux`, `NativeWebView.Platform.iOS`, `NativeWebView.Platform.Android`, or `NativeWebView.Platform.Browser` as needed.
 
+Package installation and backend registration are broader than any single surface's runtime status. Check `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` before treating a specific `NativeWebView`, `NativeWebDialog`, or `WebAuthenticationBroker` target as production-ready.
+
 Optional facades:
 
 ```bash
 dotnet add package NativeWebView.Dialog
 dotnet add package NativeWebView.Auth
 ```
+
+- `NativeWebView.Dialog` is meaningful on the desktop runtime paths: Windows, macOS, and Linux.
+- `NativeWebView.Auth` is implemented across the current Windows, macOS, Linux, iOS, Android, and Browser runtime paths.
+- iOS and Android runtime support comes from their platform-targeted backend assemblies rather than the default `net8.0` contract build.
 
 ## Package Layout
 
@@ -50,6 +56,8 @@ var factory = new NativeWebViewBackendFactory();
 factory.UseNativeWebViewWindows();
 ```
 
+This registers the Windows capability contract, and the current repo now also ships real Windows runtime paths for `NativeWebView`, `NativeWebDialog`, and `WebAuthenticationBroker`.
+
 If you rely on default constructors, runtime auto-registration is available:
 
 ```csharp
@@ -66,6 +74,16 @@ NativeWebViewDiagnosticsValidator.EnsureReady(diagnostics);
 ```
 
 This is the recommended startup guard in both samples and CI.
+
+If your application requires the real embedded `NativeWebView` control runtime, pair diagnostics with:
+
+```csharp
+var implementationStatus = NativeWebViewPlatformImplementationStatusMatrix.Get(NativeWebViewPlatform.Windows);
+if (implementationStatus.EmbeddedControl != NativeWebViewRepositoryImplementationStatus.RuntimeImplemented)
+{
+    throw new PlatformNotSupportedException("Embedded control runtime is not implemented for this target yet.");
+}
+```
 
 ## Avalonia Integration Notes
 

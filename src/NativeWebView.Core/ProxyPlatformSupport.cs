@@ -56,8 +56,8 @@ public static class NativeWebViewProxyPlatformSupportMatrix
             NativeWebViewPlatform.Windows => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.PerInstance,
-                NativeWebViewProxyRepositorySupport.ContractOnly,
-                "WebView2 can accept proxy configuration through AdditionalBrowserArguments, but the Windows backend in this repo is still a stub."),
+                NativeWebViewProxyRepositorySupport.RuntimeApplied,
+                "The embedded Windows NativeWebView control applies per-instance proxy settings by merging them into WebView2 AdditionalBrowserArguments."),
             NativeWebViewPlatform.MacOS => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.PerInstance,
@@ -67,19 +67,19 @@ public static class NativeWebViewProxyPlatformSupportMatrix
             NativeWebViewPlatform.Linux => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.PerInstance,
-                NativeWebViewProxyRepositorySupport.ContractOnly,
-                "WebKitGTK can apply proxy settings through WebsiteDataManager, but the Linux backend in this repo is still a stub."),
+                NativeWebViewProxyRepositorySupport.RuntimeApplied,
+                "The embedded Linux NativeWebView control applies explicit per-instance proxy settings through WebKitGTK WebsiteDataManager on the X11 runtime path."),
             NativeWebViewPlatform.IOS => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.PerInstance,
-                NativeWebViewProxyRepositorySupport.ContractOnly,
-                "WebKit exposes per-instance proxy configuration on iOS 17+, but this repo does not yet have a real iOS hosting/backend path.",
+                NativeWebViewProxyRepositorySupport.RuntimeApplied,
+                "The embedded iOS NativeWebView control applies explicit per-instance proxy settings through WKWebsiteDataStore proxy configuration on iOS 17+ when the iOS backend is built with the .NET 8 Apple workload; PAC remains contract-only.",
                 minimumPlatformVersion: "iOS 17.0"),
             NativeWebViewPlatform.Android => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.ApplicationWide,
                 NativeWebViewProxyRepositorySupport.ContractOnly,
-                "AndroidX WebKit proxy override is app-wide rather than per-WebView, and this repo does not integrate that process-wide API."),
+                "The embedded Android NativeWebView control now ships a real android.webkit.WebView runtime path, but AndroidX WebKit proxy override is app-wide rather than per-WebView and this repo does not integrate that process-wide API."),
             NativeWebViewPlatform.Browser => new NativeWebViewProxyPlatformSupport(
                 platform,
                 NativeWebViewProxyPlatformCapability.Unsupported,

@@ -6,6 +6,10 @@ title: "NativeWebView"
 
 `NativeWebView` is the embedded browser control for Avalonia. It derives from `NativeControlHost` and resolves the active platform backend either from an explicitly supplied backend or from `NativeWebViewRuntime`.
 
+Current repo runtime status: the embedded native host path is implemented on Windows, macOS, and Linux in the default desktop build. Linux uses a GTK3/WebKitGTK child host on X11. iOS and Android runtime support comes from their platform-targeted backend assemblies rather than the default `net8.0` contract build, and Browser support comes from the browser-targeted backend assembly. Browser uses Avalonia Browser native hosting plus an embedded `iframe`; navigation is real, but script execution and `window.chrome.webview`-style messaging are limited by same-origin browser security rules. Use `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` when you need the honest current repo status for the current app build.
+
+Companion surfaces are available when embedding is not the right fit: [`NativeWebDialog`](nativewebdialog.md) for desktop popup windows and [`WebAuthenticationBroker`](webauthenticationbroker.md) for auth callback flows.
+
 ## Core Capabilities
 
 - Navigation lifecycle and history state.
@@ -25,7 +29,7 @@ title: "NativeWebView"
 | `InstanceConfiguration` | Per-instance environment/controller defaults, including proxy and storage directories. |
 | `CanGoBack`, `CanGoForward` | Navigation history state. |
 | `IsDevToolsEnabled`, `IsContextMenuEnabled`, `IsStatusBarEnabled`, `IsZoomControlEnabled` | Capability-backed runtime toggles. |
-| `ZoomFactor`, `HeaderString`, `UserAgentString` | Browser behavior configuration. |
+| `ZoomFactor`, `HeaderString`, `UserAgentString` | Backend behavior configuration. |
 | `RenderMode`, `RenderFramesPerSecond` | Render strategy and frame pump rate for composited modes. |
 | `IsUsingSyntheticFrameSource`, `RenderDiagnosticsMessage`, `RenderStatistics` | Composition diagnostics and capture statistics. |
 | `MacOsCompositedPassthroughOverride` | Manual passthrough override for macOS composited mode. |
@@ -59,6 +63,8 @@ title: "NativeWebView"
 
 Backends advertise support through `Features`. When a backend does not support an operation, capability flags expose that in advance and the method call throws `PlatformNotSupportedException` if invoked anyway.
 
+`Features` describe platform capability contracts. They are not a substitute for `NativeWebViewPlatformImplementationStatusMatrix` when you need to know whether this repository already ships a real native host path for the current target.
+
 ## Typical Initialization Pattern
 
 ```csharp
@@ -88,10 +94,16 @@ Use `NativeWebViewRenderFrameMetadataSerializer.ReadFromFileAsync` to load the s
 
 ## Proxy Notes
 
+- Check `NativeWebViewPlatformImplementationStatusMatrix.Get(platform)` before assuming the current target has a real embedded runtime path.
 - Check `Features.Supports(NativeWebViewFeature.ProxyConfiguration)` before relying on runtime proxy application.
-- In the current repo implementation, per-instance proxy application is effective on macOS 14+ only.
+- In the current repo implementation, per-instance proxy application is effective on the embedded Windows and Linux `NativeWebView` controls, on macOS 14+, and on iOS 17+ when the iOS backend is built with the .NET 8 Apple workload.
 - The macOS runtime path supports explicit `http`, `https`, and `socks5` proxy servers plus bypass domains.
-- `Proxy.AutoConfigUrl` is not applied by the current macOS integration.
+- The iOS runtime path supports explicit `http`, `https`, and `socks5` proxy servers, credentials, and bypass domains on iOS 17+.
+- The Windows runtime path applies proxy settings through WebView2 `AdditionalBrowserArguments`.
+- The Linux runtime path applies explicit proxy settings through WebKitGTK website data manager settings on X11.
+- The Android runtime path is real, but Android proxy override remains app-wide and is not applied per `WebView` instance by this repo.
+- The Browser runtime path is real, but browser security rules still apply: pages may refuse framing, and cross-origin pages cannot be script-driven through the embedded iframe host.
+- `Proxy.AutoConfigUrl` is not applied by the current Apple runtime integrations in this repo.
 
 ## Related
 

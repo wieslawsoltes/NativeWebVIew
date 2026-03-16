@@ -1,0 +1,2 @@
+[Added] Implemented the embedded Android NativeWebView control runtime with backend-owned child `View` attachment, `android.webkit.WebView` hosting, JS messaging, new-window interception, zoom control support, and synthetic composited frame capture.
+[Fixed] Corrected runtime status, diagnostics, and documentation so Android is reported as an implemented embedded control target while per-instance proxy configuration remains app-wide and unsupported on Android.

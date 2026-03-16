@@ -21,6 +21,7 @@ By the end of this section you will have:
 - Platform backend registration for the current runtime.
 - Runtime readiness checks before first navigation.
 - A working choice between `Embedded`, `GpuSurface`, and `Offscreen` render modes.
+- Clear handoff points to `NativeWebDialog` for desktop popup windows and `WebAuthenticationBroker` for auth callback flows.
 
 ## Recommended Learning Path
 
@@ -35,8 +36,10 @@ By the end of this section you will have:
 Choose the primary surface first:
 
 - Use [`NativeWebView`](../controls/nativewebview.md) when the browser must live inside an Avalonia layout.
-- Use [`NativeWebDialog`](../controls/nativewebdialog.md) when the browser should live in a separate desktop window.
-- Use [`WebAuthenticationBroker`](../controls/webauthenticationbroker.md) when the main goal is an auth callback flow.
+- Use [`NativeWebDialog`](../controls/nativewebdialog.md) when the browser should live in a separate desktop window on Windows, macOS, or Linux.
+- Use [`WebAuthenticationBroker`](../controls/webauthenticationbroker.md) when the main goal is an auth callback flow. The repo now ships runtime implementations across Windows, macOS, Linux, iOS, Android, and Browser.
+
+Mobile and workload-specific note: the iOS and Android runtime paths come from their platform-targeted backend assemblies rather than the default `net8.0` contract build. Browser authentication is popup-based and does not provide `NativeWebDialog`.
 
 Choose the render mode next:
 

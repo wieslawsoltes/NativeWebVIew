@@ -7,6 +7,7 @@ internal static class LinuxPlatformDiagnostics
     public static NativeWebViewPlatformDiagnostics Create()
     {
         var issues = new List<NativeWebViewDiagnosticIssue>();
+        AddContractOnlyControlWarning(issues);
 
         if (!NativeWebViewDiagnosticsHostPlatformOverride.IsEffectiveHostPlatform(NativeWebViewPlatform.Linux))
         {
@@ -77,6 +78,19 @@ internal static class LinuxPlatformDiagnostics
                 severity: NativeWebViewDiagnosticSeverity.Error,
                 message: $"WebKitGTK {versionOverride} is below required version {minimum}.",
                 recommendation: "Upgrade WebKitGTK runtime/dev packages to 4.1+."));
+        }
+    }
+
+    private static void AddContractOnlyControlWarning(List<NativeWebViewDiagnosticIssue> issues)
+    {
+        var implementationStatus = NativeWebViewPlatformImplementationStatusMatrix.Get(NativeWebViewPlatform.Linux);
+        if (implementationStatus.EmbeddedControl != NativeWebViewRepositoryImplementationStatus.RuntimeImplemented)
+        {
+            issues.Add(new NativeWebViewDiagnosticIssue(
+                code: "linux.control.contract_only",
+                severity: NativeWebViewDiagnosticSeverity.Warning,
+                message: "Linux currently registers the NativeWebView control contract, but the embedded control runtime is not implemented in this repo yet.",
+                recommendation: "Treat Linux embedded control support as planned work and check NativeWebViewPlatformImplementationStatusMatrix before shipping."));
         }
     }
 }

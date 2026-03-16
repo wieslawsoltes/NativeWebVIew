@@ -14,9 +14,23 @@ public interface INativeWebViewPlatformHandleProvider : IPlatformHandleProvider
     bool TryGetControllerHandle(out NativePlatformHandle handle);
 }
 
+public interface INativeWebViewManagedControlHandleProvider
+{
+    object CreateManagedControlHandle();
+
+    void ReleaseManagedControlHandle(object? handle);
+}
+
 public interface INativeWebDialogPlatformHandleProvider : IPlatformHandleProvider
 {
     bool TryGetDialogHandle(out NativePlatformHandle handle);
 
     bool TryGetHostWindowHandle(out NativePlatformHandle handle);
+}
+
+public interface INativeWebViewNativeControlAttachment
+{
+    NativePlatformHandle AttachToNativeParent(NativePlatformHandle parentHandle);
+
+    void DetachFromNativeParent();
 }

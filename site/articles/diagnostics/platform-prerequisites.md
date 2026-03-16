@@ -35,6 +35,8 @@ You can also use runtime auto-registration:
 var diagnostics = NativeWebViewRuntime.GetCurrentPlatformDiagnostics();
 ```
 
+Diagnostics now also warn when a platform only exposes a contract-only embedded `NativeWebView` control path. Use `NativeWebViewPlatformImplementationStatusMatrix.Get(...)` when you need a direct status check in addition to prerequisite validation.
+
 ## Diagnostic Semantics
 
 - `Info`: informative status message.
@@ -52,8 +54,9 @@ var diagnostics = NativeWebViewRuntime.GetCurrentPlatformDiagnostics();
 
 1. Register the platform backend module.
 2. Read diagnostics for the active platform.
-3. Fail fast when any issue has `Error` severity.
-4. Log warnings with remediation guidance.
+3. Check `NativeWebViewPlatformImplementationStatusMatrix` if your app requires a real embedded control runtime instead of a contract-only backend.
+4. Fail fast when any issue has `Error` severity.
+5. Log warnings with remediation guidance.
 
 ## Strict Validation Helper
 

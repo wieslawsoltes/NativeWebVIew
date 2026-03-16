@@ -1,0 +1,2 @@
+[Added] Implemented the embedded Browser NativeWebView control runtime with Avalonia Browser native hosting, a real DOM `iframe`, same-origin DOM/script bridging, message roundtrips, and synthetic render-frame capture support.
+[Fixed] Corrected implementation status, diagnostics, and documentation so Browser is reported as an implemented embedded control target while per-instance proxy support remains unsupported.

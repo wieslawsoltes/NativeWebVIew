@@ -1,4 +1,5 @@
 using NativeWebView.Dialog;
+using NativeWebView.Interop;
 using NativeWebView.Platform.Android;
 using NativeWebView.Platform.Browser;
 using NativeWebView.Platform.Linux;
@@ -15,8 +16,8 @@ public sealed class ProxyConfigurationSupportTests
     {
         var windows = NativeWebViewProxyPlatformSupportMatrix.Get(NativeWebViewPlatform.Windows);
         Assert.Equal(NativeWebViewProxyPlatformCapability.PerInstance, windows.PlatformCapability);
-        Assert.Equal(NativeWebViewProxyRepositorySupport.ContractOnly, windows.RepositorySupport);
-        Assert.False(windows.SupportsPerInstanceRuntimeApplication);
+        Assert.Equal(NativeWebViewProxyRepositorySupport.RuntimeApplied, windows.RepositorySupport);
+        Assert.True(windows.SupportsPerInstanceRuntimeApplication);
 
         var macOS = NativeWebViewProxyPlatformSupportMatrix.Get(NativeWebViewPlatform.MacOS);
         Assert.Equal(NativeWebViewProxyPlatformCapability.PerInstance, macOS.PlatformCapability);
@@ -26,11 +27,11 @@ public sealed class ProxyConfigurationSupportTests
 
         var linux = NativeWebViewProxyPlatformSupportMatrix.Get(NativeWebViewPlatform.Linux);
         Assert.Equal(NativeWebViewProxyPlatformCapability.PerInstance, linux.PlatformCapability);
-        Assert.Equal(NativeWebViewProxyRepositorySupport.ContractOnly, linux.RepositorySupport);
+        Assert.Equal(NativeWebViewProxyRepositorySupport.RuntimeApplied, linux.RepositorySupport);
 
         var ios = NativeWebViewProxyPlatformSupportMatrix.Get(NativeWebViewPlatform.IOS);
         Assert.Equal(NativeWebViewProxyPlatformCapability.PerInstance, ios.PlatformCapability);
-        Assert.Equal(NativeWebViewProxyRepositorySupport.ContractOnly, ios.RepositorySupport);
+        Assert.Equal(NativeWebViewProxyRepositorySupport.RuntimeApplied, ios.RepositorySupport);
         Assert.Equal("iOS 17.0", ios.MinimumPlatformVersion);
 
         var android = NativeWebViewProxyPlatformSupportMatrix.Get(NativeWebViewPlatform.Android);
@@ -196,17 +197,17 @@ public sealed class ProxyConfigurationSupportTests
     }
 
     [Fact]
-    public void OnlyMacOSBackend_AdvertisesPerInstanceProxyConfiguration()
+    public void WindowsLinuxAndSupportedMacOSBackends_AdvertisePerInstanceProxyConfiguration()
     {
         var macOsProxySupport = OperatingSystem.IsMacOSVersionAtLeast(14);
-        var cases = new (NativeWebViewPlatform Platform, Action<NativeWebViewBackendFactory> Register, bool Expected)[]
+        var cases = new (NativeWebViewPlatform Platform, Action<NativeWebViewBackendFactory> Register, Func<INativeWebViewBackend, bool> Expected)[]
         {
-            (NativeWebViewPlatform.Windows, static factory => factory.UseNativeWebViewWindows(), false),
-            (NativeWebViewPlatform.MacOS, static factory => factory.UseNativeWebViewMacOS(), macOsProxySupport),
-            (NativeWebViewPlatform.Linux, static factory => factory.UseNativeWebViewLinux(), false),
-            (NativeWebViewPlatform.IOS, static factory => factory.UseNativeWebViewIOS(), false),
-            (NativeWebViewPlatform.Android, static factory => factory.UseNativeWebViewAndroid(), false),
-            (NativeWebViewPlatform.Browser, static factory => factory.UseNativeWebViewBrowser(), false),
+            (NativeWebViewPlatform.Windows, static factory => factory.UseNativeWebViewWindows(), static _ => true),
+            (NativeWebViewPlatform.MacOS, static factory => factory.UseNativeWebViewMacOS(), _ => macOsProxySupport),
+            (NativeWebViewPlatform.Linux, static factory => factory.UseNativeWebViewLinux(), static _ => true),
+            (NativeWebViewPlatform.IOS, static factory => factory.UseNativeWebViewIOS(), backend => backend is INativeWebViewNativeControlAttachment && OperatingSystem.IsIOSVersionAtLeast(17)),
+            (NativeWebViewPlatform.Android, static factory => factory.UseNativeWebViewAndroid(), static _ => false),
+            (NativeWebViewPlatform.Browser, static factory => factory.UseNativeWebViewBrowser(), static _ => false),
         };
 
         foreach (var (platform, register, expected) in cases)
@@ -217,7 +218,7 @@ public sealed class ProxyConfigurationSupportTests
             Assert.True(factory.TryCreateNativeWebViewBackend(platform, out var backend));
             using (backend)
             {
-                Assert.Equal(expected, backend.Features.Supports(NativeWebViewFeature.ProxyConfiguration));
+                Assert.Equal(expected(backend), backend.Features.Supports(NativeWebViewFeature.ProxyConfiguration));
             }
         }
     }

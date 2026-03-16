@@ -44,11 +44,11 @@ Use this event to configure profile, private-mode, and script-locale behavior wh
 | Platform | Native engine capability | Current repo status |
 | --- | --- | --- |
 | macOS | `WKWebsiteDataStore.proxyConfigurations` (`macOS 14+`) | Implemented for `NativeWebView` and `NativeWebDialog` with explicit `http`, `https`, and `socks5` proxy servers plus bypass domains. |
-| Windows | WebView2 environment arguments / Chromium proxy flags | Not yet runtime-applied because the current Windows backend remains a contract stub. |
-| Linux | WebKitGTK website data manager proxy settings | Not yet runtime-applied because the current Linux backend remains a contract stub. |
-| iOS | `WKWebsiteDataStore.proxyConfigurations` (`iOS 17+`) | Not yet runtime-applied because the current iOS backend remains a contract stub. |
+| Windows | WebView2 environment arguments / Chromium proxy flags | Runtime-applied for the embedded Windows `NativeWebView` control. |
+| Linux | WebKitGTK website data manager proxy settings | Runtime-applied for the embedded Linux `NativeWebView` control on the X11 host path with explicit proxy servers and bypass domains. |
+| iOS | `WKWebsiteDataStore.proxyConfigurations` (`iOS 17+`) | Runtime-applied for the embedded iOS `NativeWebView` control when the iOS backend is built with the .NET 8 Apple workload; supports explicit `http`, `https`, and `socks5` proxy servers, credentials, and bypass domains. |
 | Android | AndroidX `ProxyController` | Unsupported for per-instance use because the official override is app-wide, not per-WebView. |
-| Browser | Host browser integration | Unsupported because the hosted browser target does not expose per-instance engine proxy control in the current implementation. |
+| Browser | Host browser integration | Unsupported because the hosted browser target does not expose per-instance engine proxy control on the implemented iframe runtime path. |
 
 Use `NativeWebViewProxyPlatformSupportMatrix.Get(platform)` when you need the same support verdict in code rather than documentation.
 
@@ -61,7 +61,7 @@ The core package now exposes backend-translation helpers for platforms that have
 - `NativeWebViewLinuxProxySettingsBuilder.Build(...)`
   Converts `NativeWebViewProxyOptions` into a WebKitGTK-style default-proxy URI plus ignore-host list.
 
-These helpers are groundwork for future backends or custom integrations; they do not by themselves make the current Windows or Linux repo backends runtime-capable.
+These helpers are also used by the current Windows and Linux runtime backends; they remain useful for custom integrations on other targets.
 
 ## Example
 
@@ -93,9 +93,9 @@ WebViewControl.CoreWebView2ControllerOptionsRequested += (_, e) =>
 ## Notes
 
 - `InstanceConfiguration` is copied per control instance, so multiple `NativeWebView` controls can start from the same template and then diverge safely.
-- Exact `UserDataFolder` / `CacheFolder` / `CookieDataFolder` / `SessionDataFolder` semantics are backend-specific. In the current repo, unsupported runtime backends still surface these values as contracts, and the macOS proxy runtime path uses them as part of isolated data-store identity rather than direct physical directory mapping.
+- Exact `UserDataFolder` / `CacheFolder` / `CookieDataFolder` / `SessionDataFolder` semantics are backend-specific. In the current repo, Linux runtime-applies `CookieDataFolder`, `Language`, `IsInPrivateModeEnabled`, and explicit proxy settings on the embedded control path, while `UserDataFolder`, `CacheFolder`, and `SessionDataFolder` remain backend-specific contracts there. The macOS and iOS `WKWebView` runtime paths use storage-path and profile-name values as part of isolated data-store identity rather than direct physical directory mapping.
 - On macOS, assign proxy settings before the control is attached or before a dialog is shown so the native `WKWebView` can be created with a dedicated data store.
-- `Proxy.AutoConfigUrl` remains contract-only in the current repo implementation; the macOS runtime path applies explicit server proxies only.
+- `Proxy.AutoConfigUrl` remains contract-only in the current repo implementation; the macOS, Linux, and iOS runtime paths apply explicit server proxies only.
 - Events are raised once per backend initialization in the current implementation.
 - Platforms that cannot apply some values may still expose the event for compatibility.
 - Keep event handlers deterministic because these values become part of environment reproducibility and CI diagnostics.

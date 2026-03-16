@@ -89,53 +89,22 @@ public sealed class MobileBrowserBackendMatrixTests
         using (authBackend)
         {
             var interactiveResult = await authBackend.AuthenticateAsync(
-                new Uri("https://example.com/auth"),
+                new Uri("https://example.com/callback"),
                 new Uri("https://example.com/callback"),
                 WebAuthenticationOptions.UseTitle);
 
             Assert.Equal(WebAuthenticationStatus.Success, interactiveResult.ResponseStatus);
-            Assert.NotNull(interactiveResult.ResponseData);
-
-            switch (platform)
-            {
-                case NativeWebViewPlatform.IOS:
-                    Assert.Contains("platform=ios", interactiveResult.ResponseData!, StringComparison.Ordinal);
-                    break;
-                case NativeWebViewPlatform.Android:
-                    Assert.Contains("platform=android", interactiveResult.ResponseData!, StringComparison.Ordinal);
-                    break;
-                case NativeWebViewPlatform.Browser:
-                    Assert.Contains("platform=browser", interactiveResult.ResponseData!, StringComparison.Ordinal);
-                    Assert.Contains("popup=1", interactiveResult.ResponseData!, StringComparison.Ordinal);
-                    break;
-            }
+            Assert.Equal("https://example.com/callback", interactiveResult.ResponseData);
 
             var composedResult = await authBackend.AuthenticateAsync(
-                new Uri("https://example.com/auth"),
+                new Uri("https://example.com/callback?state=123#token=seed"),
                 new Uri("https://example.com/callback?state=123#token=seed"),
                 WebAuthenticationOptions.UseTitle);
 
             Assert.Equal(WebAuthenticationStatus.Success, composedResult.ResponseStatus);
-            Assert.NotNull(composedResult.ResponseData);
-
-            switch (platform)
-            {
-                case NativeWebViewPlatform.IOS:
-                    Assert.Equal(
-                        "https://example.com/callback?state=123#token=seed&platform=ios&status=success",
-                        composedResult.ResponseData);
-                    break;
-                case NativeWebViewPlatform.Android:
-                    Assert.Equal(
-                        "https://example.com/callback?state=123#token=seed&platform=android&status=success",
-                        composedResult.ResponseData);
-                    break;
-                case NativeWebViewPlatform.Browser:
-                    Assert.Equal(
-                        "https://example.com/callback?state=123&popup=1&platform=browser#token=seed",
-                        composedResult.ResponseData);
-                    break;
-            }
+            Assert.Equal(
+                "https://example.com/callback?state=123#token=seed",
+                composedResult.ResponseData);
 
             var silentResult = await authBackend.AuthenticateAsync(
                 new Uri("https://example.com/auth"),
@@ -144,13 +113,13 @@ public sealed class MobileBrowserBackendMatrixTests
 
             Assert.Equal(WebAuthenticationStatus.UserCancel, silentResult.ResponseStatus);
 
-            if (platform is NativeWebViewPlatform.Android)
-            {
-                var postResult = await authBackend.AuthenticateAsync(
-                    new Uri("https://example.com/auth"),
-                    new Uri("https://example.com/callback"),
-                    WebAuthenticationOptions.UseHttpPost);
+            var postResult = await authBackend.AuthenticateAsync(
+                new Uri("https://example.com/auth"),
+                new Uri("https://example.com/callback"),
+                WebAuthenticationOptions.UseHttpPost);
 
+            if (platform is NativeWebViewPlatform.IOS or NativeWebViewPlatform.Android or NativeWebViewPlatform.Browser)
+            {
                 Assert.Equal(WebAuthenticationStatus.ErrorHttp, postResult.ResponseStatus);
             }
         }

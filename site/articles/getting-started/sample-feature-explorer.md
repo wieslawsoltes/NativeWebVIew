@@ -19,8 +19,8 @@ The sample exercises:
 - `NativeWebView` navigation, messaging, printing, state, and native handles.
 - Render mode switching between `Embedded`, `GpuSurface`, and `Offscreen`.
 - Managed overlay testing for airspace verification.
-- `NativeWebDialog` actions on desktop backends.
-- `WebAuthenticationBroker` flows.
+- `NativeWebDialog` actions on the desktop runtime backends: Windows, macOS, and Linux.
+- `WebAuthenticationBroker` flows on desktop, plus shared controller behavior used by the mobile and browser runtime paths.
 - Runtime diagnostics and feature summaries.
 
 ## Deterministic Smoke Mode
@@ -51,6 +51,8 @@ For mobile or browser smoke validation:
 ```bash
 ./scripts/run-mobile-browser-sample-smoke.sh --configuration Release --platform all
 ```
+
+This path is the right place to validate workload-gated iOS/Android backends and the browser runtime, including popup-based browser auth.
 
 ## When to Use the Sample
 
