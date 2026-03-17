@@ -124,6 +124,45 @@ public sealed class WebAuthenticationBrokerSupportTests
     }
 
     [Fact]
+    public async Task AuthenticateWithDialogAsync_DoesNotProbeScriptBeforeShowingDialog()
+    {
+        var callback = new Uri("https://example.com/callback?code=123#state=seed");
+        var probedBeforeShow = false;
+        TestDialogBackend? backend = null;
+        backend = new TestDialogBackend(
+            navigateHandler: (dialog, requestUri) =>
+            {
+                _ = requestUri;
+                dialog.CurrentUrl = callback;
+            },
+            executeScriptHandler: (script, cancellationToken) =>
+            {
+                _ = script;
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (!backend!.ShowCalled)
+                {
+                    probedBeforeShow = true;
+                }
+
+                var currentUrl = backend.CurrentUrl?.AbsoluteUri ?? "about:blank";
+                return Task.FromResult<string?>($"\"{currentUrl}\"");
+            });
+
+        var result = await WebAuthenticationBrokerBackendSupport.AuthenticateWithDialogAsync(
+            backend,
+            new Uri("https://example.com/auth"),
+            callback,
+            WebAuthenticationOptions.UseTitle);
+
+        Assert.Equal(WebAuthenticationStatus.Success, result.ResponseStatus);
+        Assert.False(probedBeforeShow);
+        Assert.True(backend.ShowCalled);
+        Assert.True(backend.CloseCalled);
+        Assert.True(backend.DisposeCalled);
+    }
+
+    [Fact]
     public async Task AuthenticateWithDialogAsync_ReturnsUserCancel_WhenDialogClosesBeforeCallback()
     {
         var backend = new TestDialogBackend((dialog, requestUri) =>

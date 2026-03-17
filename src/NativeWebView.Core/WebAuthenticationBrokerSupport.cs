@@ -212,13 +212,6 @@ internal static class WebAuthenticationBrokerBackendSupport
 
         try
         {
-            var callbackObserverTask = ObserveCallbackUriAsync(
-                dialogBackend,
-                callbackUri,
-                TryCompleteFromCallbackUri,
-                () => Volatile.Read(ref completionState) != 0,
-                cancellationToken);
-
             dialogBackend.Show(new NativeWebDialogShowOptions
             {
                 Title = CreateInteractiveTitle(requestUri, options),
@@ -227,9 +220,16 @@ internal static class WebAuthenticationBrokerBackendSupport
                 CenterOnParent = true,
             });
 
+            var callbackObserverTask = ObserveCallbackUriAsync(
+                dialogBackend,
+                callbackUri,
+                TryCompleteFromCallbackUri,
+                () => Volatile.Read(ref completionState) != 0,
+                cancellationToken);
+
             dialogBackend.Navigate(requestUri);
-            var result = await completion.Task.ConfigureAwait(false);
-            await callbackObserverTask.ConfigureAwait(false);
+            var result = await completion.Task.ConfigureAwait(true);
+            await callbackObserverTask.ConfigureAwait(true);
             return result;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -274,7 +274,7 @@ internal static class WebAuthenticationBrokerBackendSupport
 
             try
             {
-                var location = await dialogBackend.ExecuteScriptAsync("window.location.href", cancellationToken).ConfigureAwait(false);
+                var location = await dialogBackend.ExecuteScriptAsync("window.location.href", cancellationToken).ConfigureAwait(true);
                 if (Uri.TryCreate(ParseScriptString(location), UriKind.Absolute, out var currentUri))
                 {
                     if (tryCompleteFromUri(currentUri))
@@ -292,7 +292,7 @@ internal static class WebAuthenticationBrokerBackendSupport
                 // The dialog runtime may not be script-ready yet. Continue observing navigation.
             }
 
-            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(true);
         }
     }
 
