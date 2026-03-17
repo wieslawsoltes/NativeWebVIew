@@ -192,6 +192,8 @@
 </code></pre>
 <h2 id="diagnostics-notes">Diagnostics Notes</h2>
 <p>Use <code>NATIVEWEBVIEW_WEBVIEW2_RUNTIME_PATH</code> when you need an explicit runtime path override. If it is set, the path must exist.</p>
+<p>Windows apps that host <code>NativeWebView</code> through Avalonia <code>NativeControlHost</code> need an application manifest with supported OS declarations. The desktop sample now includes <code>app.manifest</code>; custom Windows hosts should ship the same kind of manifest to avoid the Avalonia child-window creation failure.</p>
+<p>When WebView2 rejects controller options with an invalid-argument failure, the Windows backend now retries controller creation without those options so initialization can still succeed on runtimes that do not accept the requested profile or locale settings.</p>
 <h2 id="proxy-notes">Proxy Notes</h2>
 <ul>
 <li>WebView2 can be configured via environment options and Chromium proxy arguments.</li>
