@@ -1252,7 +1252,7 @@ public sealed class AndroidNativeWebViewBackend
             : uri.ToString();
     }
 
-    private Uri? CreateUri(Android.Net.Uri? uri)
+    private Uri? CreateUri(global::Android.Net.Uri? uri)
     {
         return CreateUri(uri?.ToString());
     }
