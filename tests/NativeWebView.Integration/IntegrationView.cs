@@ -360,7 +360,7 @@ internal sealed class IntegrationView : UserControl
         }
 
         var navigationCompletion = new TaskCompletionSource<NativeWebViewNavigationCompletedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var pageReadyCompletion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var pageToNativeCompletion = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         void OnNavigationCompleted(object? sender, NativeWebViewNavigationCompletedEventArgs e)
         {
@@ -373,9 +373,9 @@ internal sealed class IntegrationView : UserControl
         void OnWebMessageReceived(object? sender, NativeWebViewMessageReceivedEventArgs e)
         {
             var message = e.Message ?? e.Json;
-            if (string.Equals(message, "page-ready:dialog", StringComparison.Ordinal))
+            if (string.Equals(message, "dialog-script-ping", StringComparison.Ordinal))
             {
-                pageReadyCompletion.TrySetResult(message!);
+                pageToNativeCompletion.TrySetResult(message!);
             }
         }
 
@@ -407,17 +407,6 @@ internal sealed class IntegrationView : UserControl
 
             dialog.Navigate(pages.DialogPageUri);
 
-            var navigationArgs = await navigationCompletion.Task
-                .WaitAsync(TimeSpan.FromSeconds(30), cancellationToken)
-                .ConfigureAwait(true);
-
-            if (!navigationArgs.IsSuccess)
-            {
-                throw new InvalidOperationException($"Dialog navigation failed: {navigationArgs.Error ?? "unknown error"}");
-            }
-
-            scenario.Evidence.Add($"navigated:{navigationArgs.Uri}");
-
             if (platform == NativeWebViewPlatform.MacOS)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(750), cancellationToken).ConfigureAwait(true);
@@ -443,20 +432,40 @@ internal sealed class IntegrationView : UserControl
             }
             else
             {
-                await pageReadyCompletion.Task
-                    .WaitAsync(TimeSpan.FromSeconds(20), cancellationToken)
+                var location = await WaitForStringResultAsync(
+                        dialog.ExecuteScriptAsync,
+                        "window.location.href",
+                        pages.DialogPageUri.AbsoluteUri,
+                        cancellationToken)
                     .ConfigureAwait(true);
 
-                var pageReady = await EvaluateBooleanAsync(
+                scenario.Evidence.Add($"location:{location}");
+
+                if (navigationCompletion.Task.IsCompletedSuccessfully)
+                {
+                    var navigationArgs = await navigationCompletion.Task.ConfigureAwait(true);
+                    if (!navigationArgs.IsSuccess)
+                    {
+                        throw new InvalidOperationException($"Dialog navigation failed: {navigationArgs.Error ?? "unknown error"}");
+                    }
+
+                    scenario.Evidence.Add($"navigated:{navigationArgs.Uri}");
+                }
+
+                await WaitForBooleanResultAsync(
                         dialog.ExecuteScriptAsync,
                         "window.__nativeWebViewIntegrationState && window.__nativeWebViewIntegrationState.pageReady",
                         cancellationToken)
                     .ConfigureAwait(true);
 
-                if (!pageReady)
-                {
-                    throw new InvalidOperationException("Dialog page did not report a ready state.");
-                }
+                await dialog.ExecuteScriptAsync(
+                        "if (window.chrome && window.chrome.webview && typeof window.chrome.webview.postMessage === 'function') { window.chrome.webview.postMessage('dialog-script-ping'); }",
+                        cancellationToken)
+                    .ConfigureAwait(true);
+
+                await pageToNativeCompletion.Task
+                    .WaitAsync(TimeSpan.FromSeconds(10), cancellationToken)
+                    .ConfigureAwait(true);
 
                 await dialog.PostWebMessageAsStringAsync("dialog-native-ping", cancellationToken).ConfigureAwait(true);
                 var lastNativeMessage = await WaitForStringResultAsync(
@@ -511,11 +520,13 @@ internal sealed class IntegrationView : UserControl
             AppendLog("[auth] Starting authentication flow.");
 
             using var broker = new WebAuthenticationBroker();
+            using var authCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            authCancellationSource.CancelAfter(TimeSpan.FromSeconds(60));
             var result = await broker.AuthenticateAsync(
                     pages.AuthRequestUri,
                     pages.AuthCallbackUri,
                     WebAuthenticationOptions.UseTitle,
-                    cancellationToken)
+                    authCancellationSource.Token)
                 .ConfigureAwait(true);
 
             if (result.ResponseStatus != WebAuthenticationStatus.Success)
@@ -645,20 +656,68 @@ internal sealed class IntegrationView : UserControl
         string expectedValue,
         CancellationToken cancellationToken)
     {
+        Exception? lastException = null;
+
         for (var attempt = 0; attempt < 30; attempt++)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var value = await EvaluateStringAsync(executeScriptAsync, script, cancellationToken).ConfigureAwait(true);
-            if (string.Equals(value, expectedValue, StringComparison.Ordinal))
+            try
             {
-                return value!;
+                var value = await EvaluateStringAsync(executeScriptAsync, script, cancellationToken).ConfigureAwait(true);
+                if (string.Equals(value, expectedValue, StringComparison.Ordinal))
+                {
+                    return value!;
+                }
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
             }
 
             await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(true);
         }
 
+        if (lastException is not null)
+        {
+            throw lastException;
+        }
+
         throw new InvalidOperationException($"Timed out waiting for script value '{expectedValue}'.");
+    }
+
+    private static async Task WaitForBooleanResultAsync(
+        Func<string, CancellationToken, Task<string?>> executeScriptAsync,
+        string script,
+        CancellationToken cancellationToken)
+    {
+        Exception? lastException = null;
+
+        for (var attempt = 0; attempt < 30; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                if (await EvaluateBooleanAsync(executeScriptAsync, script, cancellationToken).ConfigureAwait(true))
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken).ConfigureAwait(true);
+        }
+
+        if (lastException is not null)
+        {
+            throw lastException;
+        }
+
+        throw new InvalidOperationException("Timed out waiting for script boolean result to become true.");
     }
 
     private static object? ParseJsonLike(string? raw)
