@@ -98,7 +98,7 @@ while (( SECONDS < deadline )); do
     printf '%s\n' "$result_line"
     adb shell am force-stop "$package_name" >/dev/null 2>&1 || true
 
-    if grep -q '"passed":true' <<< "$result_line"; then
+    if grep -q '"passed":true}$' <<< "$result_line"; then
       echo "Android emulator integration passed."
       exit 0
     fi

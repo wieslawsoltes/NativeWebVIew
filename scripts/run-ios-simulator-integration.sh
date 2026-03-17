@@ -126,6 +126,27 @@ if [[ -z "$sim_udid" ]]; then
   exit 1
 fi
 
+if command -v open >/dev/null 2>&1; then
+  # SpringBoard may reject launches until the Simulator app attaches to the booted device.
+  open -a Simulator --args -CurrentDeviceUDID "$sim_udid" >/dev/null 2>&1 || true
+fi
+
+springboard_deadline=$((SECONDS + 30))
+while (( SECONDS < springboard_deadline )); do
+  if xcrun simctl launch "$sim_udid" com.apple.Preferences >/dev/null 2>&1; then
+    xcrun simctl terminate "$sim_udid" com.apple.Preferences >/dev/null 2>&1 || true
+    break
+  fi
+
+  sleep 2
+done
+
+if ! xcrun simctl launch "$sim_udid" com.apple.Preferences >/dev/null 2>&1; then
+  echo "Timed out waiting for SpringBoard to accept application launches on simulator ${sim_udid}." >&2
+  exit 1
+fi
+xcrun simctl terminate "$sim_udid" com.apple.Preferences >/dev/null 2>&1 || true
+
 arch="$(uname -m)"
 runtime_id="iossimulator-x64"
 if [[ "$arch" == "arm64" ]]; then
@@ -145,27 +166,45 @@ if [[ -z "$app_bundle" ]]; then
   exit 1
 fi
 
-mkdir -p artifacts/integration/ios
-stdout_log="artifacts/integration/ios/stdout.log"
-stderr_log="artifacts/integration/ios/stderr.log"
+artifacts_dir="$(pwd)/artifacts/integration/ios"
+mkdir -p "$artifacts_dir"
+stdout_log="${artifacts_dir}/stdout.log"
+stderr_log="${artifacts_dir}/stderr.log"
+launch_stderr_log="${artifacts_dir}/launch-stderr.log"
 : > "$stdout_log"
 : > "$stderr_log"
+: > "$launch_stderr_log"
 
 xcrun simctl install "$sim_udid" "$app_bundle"
 xcrun simctl terminate "$sim_udid" "$bundle_id" >/dev/null 2>&1 || true
-xcrun simctl launch \
-  --terminate-running-process \
-  --stdout="$stdout_log" \
-  --stderr="$stderr_log" \
-  "$sim_udid" \
-  "$bundle_id" >/dev/null
+
+launch_deadline=$((SECONDS + 30))
+launch_succeeded=false
+while (( SECONDS < launch_deadline )); do
+  if xcrun simctl launch \
+      --terminate-running-process \
+      --stdout="$stdout_log" \
+      --stderr="$stderr_log" \
+      "$sim_udid" \
+      "$bundle_id" >/dev/null 2>"$launch_stderr_log"; then
+    launch_succeeded=true
+    break
+  fi
+
+  sleep 2
+done
+
+if [[ "$launch_succeeded" != "true" ]]; then
+  cat "$launch_stderr_log" >&2
+  exit 1
+fi
 
 deadline=$((SECONDS + timeout_seconds))
 while (( SECONDS < deadline )); do
   result_line="$(grep -h 'NATIVEWEBVIEW_INTEGRATION_RESULT:' "$stdout_log" "$stderr_log" 2>/dev/null | tail -n 1 || true)"
   if [[ -n "$result_line" ]]; then
     printf '%s\n' "$result_line"
-    if grep -q '"passed":true' <<< "$result_line"; then
+    if grep -q '"passed":true}$' <<< "$result_line"; then
       echo "iOS simulator integration passed."
       exit 0
     fi

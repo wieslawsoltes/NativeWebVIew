@@ -623,6 +623,8 @@ internal sealed class IntegrationView : UserControl
         {
             bool booleanValue => booleanValue,
             string stringValue when bool.TryParse(stringValue, out var booleanValue) => booleanValue,
+            string stringValue when stringValue == "1" => true,
+            string stringValue when stringValue == "0" => false,
             _ => false,
         };
     }

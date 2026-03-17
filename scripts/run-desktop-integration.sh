@@ -56,7 +56,7 @@ if [[ -z "$result_line" ]]; then
   exit 1
 fi
 
-if ! grep -q '"passed":true' <<< "$result_line"; then
+if ! grep -q '"passed":true}$' <<< "$result_line"; then
   echo "Desktop integration result reported failure." >&2
   exit 1
 fi
